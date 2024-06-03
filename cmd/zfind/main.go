@@ -5,6 +5,7 @@ import (
 	"archive/zip"
 	"compress/bzip2"
 	"compress/gzip"
+	"encoding/csv"
 	"fmt"
 	"io"
 	"os"
@@ -16,6 +17,8 @@ import (
 	"github.com/laktak/zfind/filter"
 )
 
+var appVersion = "vdev"
+
 type FileInfo struct {
 	Container string
 	Name      string
@@ -26,27 +29,46 @@ type FileInfo struct {
 	ModTime   time.Time
 }
 
-var appVersion = "vdev"
+const (
+	fieldContainer = "container"
+	fieldName      = "name"
+	fieldPath      = "path"
+	fieldSize      = "size"
+	fieldDate      = "date"
+	fieldTime      = "time"
+	fieldType      = "type"
+	fieldArchive   = "archive"
+)
+
+var fields = [...]string{
+	fieldContainer,
+	fieldName,
+	fieldPath,
+	fieldSize,
+	fieldDate,
+	fieldTime,
+	fieldType,
+	fieldArchive,
+}
 
 func (file FileInfo) Context() filter.VariableGetter {
-
 	return func(name string) *filter.Value {
-		switch name {
-		case "container":
+		switch strings.ToLower(name) {
+		case fieldContainer:
 			return filter.TextValue(file.Container)
-		case "name":
+		case fieldName:
 			return filter.TextValue(file.Name)
-		case "path":
+		case fieldPath:
 			return filter.TextValue(file.Path)
-		case "size":
+		case fieldSize:
 			return filter.NumberValue(file.Size)
-		case "date":
+		case fieldDate:
 			return filter.TextValue(file.ModTime.Format("2006-01-02 15:04:05"))
-		case "time":
+		case fieldTime:
 			return filter.TextValue(file.ModTime.Format("15:04:05"))
-		case "type":
+		case fieldType:
 			return filter.TextValue(file.Type)
-		case "archive":
+		case fieldArchive:
 			return filter.TextValue(file.Archive)
 		default:
 			return nil
@@ -179,13 +201,15 @@ func findIn(filter *filter.FilterExpression, fullpath string, file os.FileInfo, 
 				found <- file2
 			}
 		}
+
 	default:
 		ft := file.Mode().Type()
 		t := "file"
-		if ft == os.ModeDir {
+		if ft&os.ModeDir != 0 {
 			t = "dir"
-		} else if ft == os.ModeSymlink {
-			t = "link"
+		}
+		if ft&os.ModeSymlink != 0 {
+			t += "-link"
 		}
 
 		file2 := FileInfo{
@@ -205,27 +229,59 @@ func findIn(filter *filter.FilterExpression, fullpath string, file os.FileInfo, 
 	return nil
 }
 
-func printFile(file FileInfo, long bool) {
-	name := ""
-	if file.Container != "" {
-		name = file.Container + "//"
+func printFile(ch chan FileInfo, long bool, archSep string) {
+	for file := range ch {
+		name := ""
+		if file.Container != "" {
+			name = file.Container + archSep
+		}
+		name += file.Path
+		if long {
+			size := filter.FormatSize(file.Size)
+			fmt.Printf("%s %10s %s\n", file.ModTime.Format("2006-01-02 15:04:05"), size, name)
+		} else {
+			fmt.Println(name)
+		}
 	}
-	name += file.Path
-	if long {
-		size := filter.FormatSize(file.Size)
-		fmt.Printf("%s %10s %s\n", file.ModTime.Format("2006-01-02 15:04:05"), size, name)
-	} else {
-		fmt.Println(name)
+}
+
+func printCsv(ch chan FileInfo) error {
+	writer := csv.NewWriter(os.Stdout)
+
+	if err := writer.Write(fields[:]); err != nil {
+		return err
 	}
+
+	for file := range ch {
+		var record []string
+		getter := file.Context()
+		for _, field := range fields {
+			value := getter(field)
+			record = append(record, (*value).String())
+		}
+		if err := writer.Write(record); err != nil {
+			return err
+		}
+	}
+
+	writer.Flush()
+
+	if err := writer.Error(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func main() {
 	var cli struct {
-		FilterHelp bool     `short:"H" help:"Show where-filter help."`
-		Where      string   `short:"w" help:"The where-filter (using sql-where syntax, see -H)."`
-		Long       bool     `short:"l" help:"Show long listing."`
-		Paths      []string `arg:"" name:"path" optional:"" help:"Paths to search."`
-		Version    bool     `short:"V" help:"Show version."`
+		FilterHelp       bool     `short:"H" help:"Show where-filter help."`
+		Where            string   `short:"w" help:"The where-filter (using sql-where syntax, see -H)."`
+		Long             bool     `short:"l" help:"Show long listing."`
+		Csv              bool     `help:"Show listing as csv."`
+		ArchiveSeparator string   `help:"Separator between the archive name and the file inside" default:"//"`
+		Version          bool     `short:"V" help:"Show version."`
+		Paths            []string `arg:"" name:"path" optional:"" help:"Paths to search."`
 	}
 
 	arg := kong.Parse(&cli)
@@ -263,7 +319,9 @@ func main() {
 		close(ch)
 	}()
 
-	for f := range ch {
-		printFile(f, cli.Long)
+	if cli.Csv {
+		arg.FatalIfErrorf(printCsv(ch))
+	} else {
+		printFile(ch, cli.Long, cli.ArchiveSeparator)
 	}
 }

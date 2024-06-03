@@ -13,10 +13,13 @@ Arguments:
   [<path> ...]    Paths to search.
 
 Flags:
-  -h, --help            Show context-sensitive help.
-  -H, --filter-help     Show where-filter help.
-  -w, --where=STRING    The where-filter (using sql-where syntax, see -H).
-  -l, --long            Show long listing.
+  -h, --help                      Show context-sensitive help.
+  -H, --filter-help               Show where-filter help.
+  -w, --where=STRING              The where-filter (using sql-where syntax, see -H).
+  -l, --long                      Show long listing.
+      --csv                       Show listing as csv.
+      --archive-separator="//"    Separator between the archive name and the file inside
+  -V, --version                   Show version.
 ```
 
 ```

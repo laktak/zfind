@@ -18,6 +18,9 @@ jobs:
     - name: chkfmt
       run: scripts/chkfmt
 
+    - name: tests
+      run: scripts/tests
+
     - name: xbuild
       run: scripts/xbuild
 

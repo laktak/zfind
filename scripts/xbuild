@@ -5,6 +5,8 @@ if [ -z "$version" ]; then
     version=$(git rev-parse HEAD)
 fi
 
+echo "building version $version"
+
 mkdir -p dist
 rm -f dist/*
 

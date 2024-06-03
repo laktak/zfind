@@ -1,0 +1,28 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-go@v5
+      with:
+        go-version: "1.22"
+
+    - name: chkfmt
+      run: scripts/chkfmt
+
+    - name: xbuild
+      run: version=${GITHUB_REF#$"refs/tags/v"} scripts/xbuild
+
+    - name: release
+      uses: softprops/action-gh-release@v2
+      with:
+        draft: true
+        files: dist/*
+

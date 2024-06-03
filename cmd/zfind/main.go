@@ -26,6 +26,8 @@ type FileInfo struct {
 	ModTime   time.Time
 }
 
+var appVersion = "vdev"
+
 func (file FileInfo) Context() filter.VariableGetter {
 
 	return func(name string) *filter.Value {
@@ -223,12 +225,18 @@ func main() {
 		Where      string   `short:"w" help:"The where-filter (using sql-where syntax, see -H)."`
 		Long       bool     `short:"l" help:"Show long listing."`
 		Paths      []string `arg:"" name:"path" optional:"" help:"Paths to search."`
+		Version    bool     `short:"V" help:"Show version."`
 	}
 
 	arg := kong.Parse(&cli)
 
 	if cli.FilterHelp {
 		fmt.Println(filter_help)
+		os.Exit(0)
+	}
+
+	if cli.Version {
+		fmt.Println(appVersion)
 		os.Exit(0)
 	}
 

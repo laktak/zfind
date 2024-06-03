@@ -1,0 +1,46 @@
+#!/bin/bash
+set -eE -o pipefail
+
+if [ -z "$version" ]; then
+    version=$(git rev-parse HEAD)
+fi
+
+mkdir -p dist
+rm -f dist/*
+
+build() {
+    echo "- $1-$2"
+    rm -f dist/zfind
+    CGO_ENABLED=0 GOOS="$1" GOARCH="$2" go build -o dist -ldflags="-X main.appVersion=$version" ./cmd/zfind
+
+    pushd dist
+
+    case "$1" in
+        windows)
+            outfile="zfind-$1-$2.zip"
+            zip "$outfile" zfind.exe --move
+            ;;
+        *)
+            outfile="zfind-$1-$2.tar.gz"
+            tar -czf "$outfile" zfind --remove-files
+            ;;
+    esac
+
+    popd
+}
+
+build android arm64
+build darwin amd64
+build darwin arm64
+build freebsd amd64
+build freebsd arm64
+build freebsd riscv64
+build linux amd64
+build linux arm64
+build linux riscv64
+build netbsd amd64
+build netbsd arm64
+build openbsd amd64
+build openbsd arm64
+build windows amd64
+build windows arm64

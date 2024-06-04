@@ -28,25 +28,28 @@ type FileInfo struct {
 func (fi FileInfo) IsDir() bool { return fi.Type == "dir" }
 
 const (
-	fieldContainer = "container"
 	fieldName      = "name"
 	fieldPath      = "path"
+	fieldContainer = "container"
 	fieldSize      = "size"
 	fieldDate      = "date"
 	fieldTime      = "time"
 	fieldType      = "type"
 	fieldArchive   = "archive"
+	fieldToday     = "today"
 )
 
 var Fields = [...]string{
-	fieldContainer,
 	fieldName,
 	fieldPath,
+	fieldContainer,
 	fieldSize,
 	fieldDate,
 	fieldTime,
 	fieldType,
 	fieldArchive,
+	// not exported
+	// fieldToday
 }
 
 func (file FileInfo) Context() filter.VariableGetter {
@@ -61,13 +64,15 @@ func (file FileInfo) Context() filter.VariableGetter {
 		case fieldSize:
 			return filter.NumberValue(file.Size)
 		case fieldDate:
-			return filter.TextValue(file.ModTime.Format("2006-01-02 15:04:05"))
+			return filter.TextValue(file.ModTime.Format(time.DateOnly))
 		case fieldTime:
-			return filter.TextValue(file.ModTime.Format("15:04:05"))
+			return filter.TextValue(file.ModTime.Format(time.TimeOnly))
 		case fieldType:
 			return filter.TextValue(file.Type)
 		case fieldArchive:
 			return filter.TextValue(file.Archive)
+		case fieldToday:
+			return filter.TextValue(time.Now().Format(time.DateOnly))
 		default:
 			return nil
 		}

@@ -22,4 +22,9 @@ The following 'columns' are available:
   archive     tar|zip if inside a container
   container   path of container (if any)
 
+
+Helper columns:
+
+  today       todays date (e.g. for "date=today")
+
 `

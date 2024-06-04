@@ -1,0 +1,4 @@
+#!/bin/bash
+set -eE -o pipefail
+
+go vet -structtag=false -composites=false ./...

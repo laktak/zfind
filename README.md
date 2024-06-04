@@ -19,6 +19,7 @@ Flags:
   -l, --long                      Show long listing.
       --csv                       Show listing as csv.
       --archive-separator="//"    Separator between the archive name and the file inside
+  -L, --follow-symlinks           Follow symbolic links.
   -V, --version                   Show version.
 ```
 

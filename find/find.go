@@ -5,6 +5,7 @@ import (
 	"archive/zip"
 	"compress/bzip2"
 	"compress/gzip"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -23,6 +24,8 @@ type FileInfo struct {
 	Archive   string
 	ModTime   time.Time
 }
+
+func (fi FileInfo) IsDir() bool { return fi.Type == "dir" }
 
 const (
 	fieldContainer = "container"
@@ -157,74 +160,67 @@ func listFilesInTar(fullpath string, filename string) ([]FileInfo, error) {
 	return files, nil
 }
 
-func findIn(filter *filter.FilterExpression, fullpath string, file os.FileInfo, found chan FileInfo, err error) error {
-	if err != nil {
-		return err
+func findIn(param WalkParams, fi FileInfo) {
+
+	if ok, err := param.Filter.Test(fi.Context()); err != nil {
+		param.SendErr(err)
+		return
+	} else if ok {
+		param.Chan <- fi
 	}
 
-	filename := file.Name()
+	filename := fi.Name
 	isTar, isZip := false, false
-
-	if !file.IsDir() {
+	if !fi.IsDir() {
 		isTar = strings.HasSuffix(filename, ".tar") || strings.HasSuffix(filename, ".tar.gz") || strings.HasSuffix(filename, ".tgz") || strings.HasSuffix(filename, ".tar.bz2") || strings.HasSuffix(filename, ".tbz2")
 		isZip = strings.HasSuffix(filename, ".zip")
 	}
 
+	var files []FileInfo
+	var err error = nil
+
 	switch {
 	case isTar:
-		files, err := listFilesInTar(fullpath, filename)
-		if err != nil {
-			return err
-		}
-		for _, file2 := range files {
-			if ok, err := filter.Test(file2.Context()); err != nil {
-				return err
-			} else if ok {
-				found <- file2
-			}
-		}
+		files, err = listFilesInTar(fi.Path, filename)
 
 	case isZip:
-		files, err := listFilesInZip(fullpath, filename)
-		if err != nil {
-			return err
-		}
-		for _, file2 := range files {
-			if ok, err := filter.Test(file2.Context()); err != nil {
-				return err
-			} else if ok {
-				found <- file2
-			}
-		}
-
+		files, err = listFilesInZip(fi.Path, filename)
 	default:
-		ft := file.Mode().Type()
-		t := "file"
-		if ft&os.ModeDir != 0 {
-			t = "dir"
-		} else if ft&os.ModeSymlink != 0 {
-			t = "link"
-		}
+		return
+	}
 
-		file2 := FileInfo{
-			Path:    fullpath,
-			Name:    file.Name(),
-			Size:    file.Size(),
-			ModTime: file.ModTime(),
-			Type:    t,
-		}
-
-		if ok, err := filter.Test(file2.Context()); err != nil {
-			return err
+	if err != nil {
+		param.SendErr(err)
+		return
+	}
+	for _, fi2 := range files {
+		if ok, err := param.Filter.Test(fi2.Context()); err != nil {
+			param.SendErr(err)
+			return
 		} else if ok {
-			found <- file2
+			param.Chan <- fi2
 		}
 	}
-	return nil
 }
 
-func Walk(filter *filter.FilterExpression, root string, found chan FileInfo) error {
-	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		return findIn(filter, path, info, found, err)
+type WalkParams struct {
+	Chan           chan FileInfo
+	Err            chan string
+	Filter         *filter.FilterExpression
+	FollowSymlinks bool
+}
+
+func (wp WalkParams) SendErr(err error) {
+	serr := fmt.Sprintf("%v", err)
+	wp.Err <- serr
+}
+
+func Walk(root string, param WalkParams) error {
+	return fsWalk(root, param.FollowSymlinks, func(fi *FileInfo, err error) {
+		if err == nil {
+			findIn(param, *fi)
+		} else {
+			param.SendErr(err)
+		}
 	})
 }

@@ -63,6 +63,7 @@ func main() {
 		Long             bool     `short:"l" help:"Show long listing."`
 		Csv              bool     `help:"Show listing as csv."`
 		ArchiveSeparator string   `help:"Separator between the archive name and the file inside" default:"//"`
+		FollowSymlinks   bool     `short:"L" help:"Follow symbolic links."`
 		Version          bool     `short:"V" help:"Show version."`
 		Paths            []string `arg:"" name:"path" optional:"" help:"Paths to search."`
 	}
@@ -91,13 +92,25 @@ func main() {
 	arg.FatalIfErrorf(err)
 
 	ch := make(chan find.FileInfo)
+	errChan := make(chan string)
 
 	go func() {
 		for _, searchPath := range cli.Paths {
-			err = find.Walk(filter, searchPath, ch)
+			err = find.Walk(searchPath, find.WalkParams{
+				Chan:           ch,
+				Err:            errChan,
+				Filter:         filter,
+				FollowSymlinks: cli.FollowSymlinks})
 			arg.FatalIfErrorf(err)
 		}
 		close(ch)
+	}()
+
+	go func() {
+		for errmsg := range errChan {
+			fmt.Fprintln(os.Stderr, errmsg)
+		}
+		close(errChan)
 	}()
 
 	if cli.Csv {

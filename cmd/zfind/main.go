@@ -60,7 +60,7 @@ func main() {
 	var cli struct {
 		FilterHelp       bool     `short:"H" help:"Show where-filter help."`
 		Where            string   `short:"w" help:"The where-filter (using sql-where syntax, see -H)."`
-		Long             bool     `short:"l" help:"Show long listing."`
+		Long             bool     `short:"l" help:"Show long listing format."`
 		Csv              bool     `help:"Show listing as csv."`
 		ArchiveSeparator string   `help:"Separator between the archive name and the file inside" default:"//"`
 		FollowSymlinks   bool     `short:"L" help:"Follow symbolic links."`

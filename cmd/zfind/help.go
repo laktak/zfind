@@ -1,30 +1,42 @@
 package main
 
 var filter_help = `
-zfind uses a filter syntax that closely resembles an SQL-WHERE clause.
+zfind uses a filter syntax that is very similar to an SQL-WHERE clause.
 
-eg.
-  name="foo.txt"
-  name like "bar%"
-  name like "%.txt" and archive="tar"
-  name in ("foo", "bar") and type="file"
-  date between "2000-01-01" and "2010-12-31"
+Examples:
 
-The following 'columns' are available:
+	# find files smaller than 10KB
+	zfind -w 'size<10k'
+
+	# find files modified before 2010 inside a tar
+	zfind -w 'date<"2010" and archive="tar"'
+
+	# find files named *.go and modified today
+	zfind -w 'name like "%.go" and date=today'
+
+	# find directories named foo and bar
+	zfind -w 'name in ("foo", "bar") and type="dir"'
+
+	# search for all README.md files and show in long listing format
+	zfind -w 'name="README.md"' -l
+
+	# show results in csv format
+	zfind --csv
+
+The following file properies are available:
 
   name        name of the file
   path        full path of the file
-              (relative to the file system or archive)
   size        file size (uncompressed)
   date        modified date in YYYY-MM-DD format
   time        modified time in HH-MM-SS format
   type        file|dir|link
-  archive     tar|zip if inside a container
+  archive     archive type tar|zip if inside a container
   container   path of container (if any)
 
+Helper properties
 
-Helper columns:
+  today       todays date
 
-  today       todays date (e.g. for "date=today")
-
+For more details go to https://github.com/laktak/zfind
 `

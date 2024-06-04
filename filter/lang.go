@@ -118,7 +118,7 @@ var (
 	exprLexer = lexer.MustSimple([]lexer.SimpleRule{
 		{`Keyword`, `(?i)\b(TRUE|FALSE|NOT|BETWEEN|AND|OR|LIKE|ILIKE|RLIKE|IN)\b`},
 		{`Ident`, `[a-zA-Z_][a-zA-Z0-9_]*`},
-		{`Size`, `\d*\.?\d+[BKMGT]`},
+		{`Size`, `\d*\.?\d+[BKMGTbkmgt]`},
 		{`Number`, `[-+]?\d*\.?\d+([eE][-+]?\d+)?`},
 		{`Text`, `'[^']*'|"[^"]*"`},
 		{`Operators`, `<>|!=|<=|>=|[,.()=<>]`},

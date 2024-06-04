@@ -33,7 +33,7 @@ zfind --csv
 
 ## Where
 
-- `AND`, `OR` and `()` parentheses are logical operators used to combine multiple conditions. 'AND' means that both conditions must be true for a row to be included in the results. 'OR' means that if either condition is true, the row will be included. Parentheses are used to group conditions, just like in mathematics.
+- `AND`, `OR` and `()` parentheses are logical operators used to combine multiple conditions. `AND` means that both conditions must be true for a row to be included in the results. `OR` means that if either condition is true, the row will be included. Parentheses are used to group conditions, just like in mathematics.
 
 Example: `-w '(size > 20M OR name = "temp") AND type="file"'` selects all files that are either greater than 20MB in size or are named temp.
 
@@ -62,8 +62,8 @@ Example: `-w "date between "2010" and "2011-01-15"` means that all files that we
 Example: `-w "name not like "z%"`, `-w "date not between "2010" and "2011-01-15"`, `-w "type not in ("file", "link")`
 
 - Values can be numbers, text, date and time, `TRUE` and `FALSE`
-  - dates have to be specified in the YYYY-MM-DD format
-  - times have to be specified in the 24h HH:MM:SS format
+  - dates have to be specified in `YYYY-MM-DD` format
+  - times have to be specified in 24h `HH:MM:SS` format
   - numbers can be written as sizes by appending `B`, `K`, `M`, `G` and `T` to specify bytes, KB, MB, GB and TB.
   - `TRUE` and `FALSE`:
   - empty strings and `0` evaluate to `false`

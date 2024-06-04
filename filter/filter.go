@@ -154,6 +154,17 @@ func not(value *value, err error) (*value, error) {
 	return boolValue(!value.Bool()), err
 }
 
+func likeToRegex(text string, caseInsensitive bool) *regexp.Regexp {
+	ex := regexp.QuoteMeta(text)
+	ex = strings.ReplaceAll(ex, "%", ".*")
+	ex = strings.ReplaceAll(ex, "_", ".")
+	ex = "^" + ex + "$"
+	if caseInsensitive {
+		ex = "(?i)^" + ex
+	}
+	return regexp.MustCompile(ex)
+}
+
 func (x *conditionRHS) eval(t *term, ctx context) (*value, error) {
 	r := false
 	switch {
@@ -182,17 +193,13 @@ func (x *conditionRHS) eval(t *term, ctx context) (*value, error) {
 			if err != nil {
 				return nil, err
 			}
-			v2r := strings.ReplaceAll(regexp.QuoteMeta(v2.String()), "%", ".*")
-			v2r = "^" + v2r + "$"
-			x.likeCache = regexp.MustCompile(v2r)
+			x.likeCache = likeToRegex(v2.String(), false)
 		case x.Ilike != nil:
 			v2, err := x.Ilike.eval(ctx)
 			if err != nil {
 				return nil, err
 			}
-			v2r := strings.ReplaceAll(regexp.QuoteMeta(v2.String()), "%", ".*")
-			v2r = "(?i)^" + v2r + "$"
-			x.likeCache = regexp.MustCompile(v2r)
+			x.likeCache = likeToRegex(v2.String(), true)
 		case x.Rlike != nil:
 			v2, err := x.Rlike.eval(ctx)
 			if err != nil {

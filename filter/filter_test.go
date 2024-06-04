@@ -13,6 +13,7 @@ type example struct {
 
 var examples = []example{
 	{true, "", "name like \"foo%\""},
+	{true, "", "name like \"fo__ar\""},
 	{true, "", "name like \"%oo%\""},
 	{true, "", "name like \"%bar\""},
 	{false, "", "name like \"oo%\""},

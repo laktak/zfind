@@ -3,6 +3,7 @@
 
 zfind allows you to search for files, including inside `tar` and `zip` archives. It makes finding files easy with a filter syntax that is similar to an SQL-WHERE clause.
 
+
 ## Basic Usage
 
 ```
@@ -68,6 +69,7 @@ Example: `-w "name not like "z%"`, `-w "date not between "2010" and "2011-01-15"
   - `TRUE` and `FALSE`:
   - empty strings and `0` evaluate to `false`
 
+
 ## Properties
 
 The following file properies are available:
@@ -88,6 +90,14 @@ Helper properties
 | name        | description                                                    |
 |-------------|----------------------------------------------------------------|
 | today       | todays date                                                    |
+
+
+## Supported archives
+
+| name        | extensions                                                     |
+|-------------|----------------------------------------------------------------|
+| tar         | `.tar`, `.tar.gz`, `.tgz`, `.tar.bz2`, `.tbz2`                 |
+| zip         | `.zip`                                                         |
 
 
 ## Installation

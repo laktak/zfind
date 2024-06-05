@@ -91,31 +91,42 @@ func main() {
 	filter, err := filter.CreateFilter(cli.Where)
 	arg.FatalIfErrorf(err)
 
+	done := make(chan bool)
 	ch := make(chan find.FileInfo)
 	errChan := make(chan string)
 
 	go func() {
 		for _, searchPath := range cli.Paths {
-			err = find.Walk(searchPath, find.WalkParams{
+			find.Walk(searchPath, find.WalkParams{
 				Chan:           ch,
 				Err:            errChan,
 				Filter:         filter,
 				FollowSymlinks: cli.FollowSymlinks})
-			arg.FatalIfErrorf(err)
 		}
 		close(ch)
-	}()
-
-	go func() {
-		for errmsg := range errChan {
-			fmt.Fprintln(os.Stderr, errmsg)
-		}
 		close(errChan)
 	}()
 
-	if cli.Csv {
-		arg.FatalIfErrorf(PrintCsv(ch))
-	} else {
-		PrintFiles(ch, cli.Long, cli.ArchiveSeparator)
+	go func() {
+		if cli.Csv {
+			arg.FatalIfErrorf(PrintCsv(ch))
+		} else {
+			PrintFiles(ch, cli.Long, cli.ArchiveSeparator)
+		}
+		done <- true
+	}()
+
+	hasErr := false
+	for errmsg := range errChan {
+		fmt.Fprintln(os.Stderr, errmsg)
+		hasErr = true
+	}
+
+	// wait for output to finish
+	<-done
+
+	if hasErr {
+		fmt.Fprintln(os.Stderr, "errors were encountered")
+		os.Exit(1)
 	}
 }

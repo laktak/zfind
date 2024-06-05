@@ -79,7 +79,7 @@ func (file FileInfo) Context() filter.VariableGetter {
 	}
 }
 
-func listFilesInZip(fullpath string, filename string) ([]FileInfo, error) {
+func listFilesInZip(fullpath string) ([]FileInfo, error) {
 	f, err := os.Open(fullpath)
 	if err != nil {
 		return nil, err
@@ -114,7 +114,7 @@ func listFilesInZip(fullpath string, filename string) ([]FileInfo, error) {
 	return files, nil
 }
 
-func listFilesInTar(fullpath string, filename string) ([]FileInfo, error) {
+func listFilesInTar(fullpath string) ([]FileInfo, error) {
 	f, err := os.Open(fullpath)
 	if err != nil {
 		return nil, err
@@ -123,11 +123,11 @@ func listFilesInTar(fullpath string, filename string) ([]FileInfo, error) {
 
 	var fr io.Reader = f
 	switch {
-	case strings.HasSuffix(filename, ".gz") || strings.HasSuffix(filename, ".tgz"):
+	case strings.HasSuffix(fullpath, ".gz") || strings.HasSuffix(fullpath, ".tgz"):
 		if fr, err = gzip.NewReader(f); err != nil {
 			return nil, err
 		}
-	case strings.HasSuffix(filename, ".bz2") || strings.HasSuffix(filename, ".tbz2"):
+	case strings.HasSuffix(fullpath, ".bz2") || strings.HasSuffix(fullpath, ".tbz2"):
 		fr = bzip2.NewReader(f)
 	}
 
@@ -174,11 +174,13 @@ func findIn(param WalkParams, fi FileInfo) {
 		param.Chan <- fi
 	}
 
-	filename := fi.Name
+	fullpath := fi.Path
 	isTar, isZip := false, false
 	if !fi.IsDir() {
-		isTar = strings.HasSuffix(filename, ".tar") || strings.HasSuffix(filename, ".tar.gz") || strings.HasSuffix(filename, ".tgz") || strings.HasSuffix(filename, ".tar.bz2") || strings.HasSuffix(filename, ".tbz2")
-		isZip = strings.HasSuffix(filename, ".zip")
+		isTar = strings.HasSuffix(fullpath, ".tar") ||
+			strings.HasSuffix(fullpath, ".tar.gz") || strings.HasSuffix(fullpath, ".tgz") ||
+			strings.HasSuffix(fullpath, ".tar.bz2") || strings.HasSuffix(fullpath, ".tbz2")
+		isZip = strings.HasSuffix(fullpath, ".zip")
 	}
 
 	var files []FileInfo
@@ -186,10 +188,10 @@ func findIn(param WalkParams, fi FileInfo) {
 
 	switch {
 	case isTar:
-		files, err = listFilesInTar(fi.Path, filename)
+		files, err = listFilesInTar(fullpath)
 
 	case isZip:
-		files, err = listFilesInZip(fi.Path, filename)
+		files, err = listFilesInZip(fullpath)
 	default:
 		return
 	}
@@ -220,8 +222,8 @@ func (wp WalkParams) SendErr(err error) {
 	wp.Err <- serr
 }
 
-func Walk(root string, param WalkParams) error {
-	return fsWalk(root, param.FollowSymlinks, func(fi *FileInfo, err error) {
+func Walk(root string, param WalkParams) {
+	fsWalk(root, param.FollowSymlinks, func(fi *FileInfo, err error) {
 		if err == nil {
 			findIn(param, *fi)
 		} else {

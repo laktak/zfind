@@ -8,15 +8,8 @@ import (
 
 type WalkFunc func(file *FileInfo, err error)
 
-func fsWalk(root string, followSymlinks bool, walkFn WalkFunc) error {
-	osFileInfo, err := os.Lstat(root)
-	if err != nil {
-		walkFn(nil, err)
-	} else {
-		fi := makeFileInfo(root, osFileInfo)
-		walkFn(&fi, nil)
-	}
-	return walk(root, root, followSymlinks, walkFn)
+func fsWalk(root string, followSymlinks bool, report WalkFunc) {
+	walk(root, root, followSymlinks, report)
 }
 
 func makeFileInfo(fullpath string, file os.FileInfo) FileInfo {
@@ -51,37 +44,41 @@ func readDirNames(dirname string) ([]string, error) {
 	return names, nil
 }
 
-func walk(path string, virtPath string, followSymlinks bool, walkFn WalkFunc) error {
+func walk(path string, virtPath string, followSymlinks bool, report WalkFunc) {
+
+	osFileInfo, err := os.Lstat(path)
+	if err != nil {
+		report(nil, err)
+	} else {
+		fi := makeFileInfo(virtPath, osFileInfo)
+		if fi.IsDir() {
+			report(&fi, nil)
+			//err = walk(path, virtPath, followSymlinks, report)
+		} else if fi.Type == "link" && followSymlinks {
+			path, err = filepath.EvalSymlinks(path)
+			if err != nil {
+				report(nil, err)
+				return
+			}
+			fi.Type = "dir"
+			report(&fi, nil)
+			//err = walk(path, virtPath, followSymlinks, report)
+		} else {
+			// file
+			report(&fi, nil)
+			return
+		}
+	}
 
 	names, err := readDirNames(path)
 	if err != nil {
-		walkFn(nil, err)
-		return nil
-	}
+		report(nil, err)
+	} else {
+		for _, name := range names {
+			rfilename := filepath.Join(path, name)
+			filename := filepath.Join(virtPath, name)
 
-	for _, name := range names {
-		rfilename := filepath.Join(path, name)
-		filename := filepath.Join(virtPath, name)
-		osFileInfo, err := os.Lstat(rfilename)
-		if err != nil {
-			walkFn(nil, err)
-		} else {
-			fi := makeFileInfo(filename, osFileInfo)
-			if fi.IsDir() {
-				walkFn(&fi, nil)
-				err = walk(rfilename, filename, followSymlinks, walkFn)
-			} else if fi.Type == "link" && followSymlinks {
-				rfilename, err = filepath.EvalSymlinks(rfilename)
-				fi.Type = "dir"
-				walkFn(&fi, nil)
-				err = walk(rfilename, filename, followSymlinks, walkFn)
-			} else {
-				walkFn(&fi, nil)
-			}
-			if err != nil {
-				walkFn(nil, err)
-			}
+			walk(rfilename, filename, followSymlinks, report)
 		}
 	}
-	return nil
 }

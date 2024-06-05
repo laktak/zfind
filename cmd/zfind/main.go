@@ -12,7 +12,7 @@ import (
 
 var appVersion = "vdev"
 
-func PrintFiles(ch chan find.FileInfo, long bool, archSep string) {
+func PrintFiles(ch chan find.FileInfo, long bool, archSep string, lineSep []byte) {
 	for file := range ch {
 		name := ""
 		if file.Container != "" {
@@ -21,10 +21,11 @@ func PrintFiles(ch chan find.FileInfo, long bool, archSep string) {
 		name += file.Path
 		if long {
 			size := filter.FormatSize(file.Size)
-			fmt.Printf("%s %10s %s\n", file.ModTime.Format("2006-01-02 15:04:05"), size, name)
+			fmt.Fprintf(os.Stdout, "%s %10s %s", file.ModTime.Format("2006-01-02 15:04:05"), size, name)
 		} else {
-			fmt.Println(name)
+			fmt.Fprint(os.Stdout, name)
 		}
+		os.Stdout.Write(lineSep)
 	}
 }
 
@@ -64,6 +65,7 @@ func main() {
 		Csv              bool     `help:"Show listing as csv."`
 		ArchiveSeparator string   `help:"Separator between the archive name and the file inside" default:"//"`
 		FollowSymlinks   bool     `short:"L" help:"Follow symbolic links."`
+		Print0           bool     `name:"print0" short:"0" help:"Use a a null character instead of the newline character, to be used with the -0 option of xargs."`
 		Version          bool     `short:"V" help:"Show version."`
 		Paths            []string `arg:"" name:"path" optional:"" help:"Paths to search."`
 	}
@@ -82,6 +84,11 @@ func main() {
 
 	if cli.Where == "" {
 		cli.Where = "1"
+	}
+
+	lineSep := []byte("\n")
+	if cli.Print0 {
+		lineSep = []byte{0}
 	}
 
 	if len(cli.Paths) == 0 {
@@ -111,7 +118,7 @@ func main() {
 		if cli.Csv {
 			arg.FatalIfErrorf(PrintCsv(ch))
 		} else {
-			PrintFiles(ch, cli.Long, cli.ArchiveSeparator)
+			PrintFiles(ch, cli.Long, cli.ArchiveSeparator, lineSep)
 		}
 		done <- true
 	}()

@@ -66,7 +66,6 @@ Example: `-w "name not like "z%"`, `-w "date not between "2010" and "2011-01-15"
   - dates have to be specified in `YYYY-MM-DD` format
   - times have to be specified in 24h `HH:MM:SS` format
   - numbers can be written as sizes by appending `B`, `K`, `M`, `G` and `T` to specify bytes, KB, MB, GB and TB.
-  - `TRUE` and `FALSE`:
   - empty strings and `0` evaluate to `false`
 
 
@@ -98,6 +97,17 @@ Helper properties
 |-------------|----------------------------------------------------------------|
 | tar         | `.tar`, `.tar.gz`, `.tgz`, `.tar.bz2`, `.tbz2`                 |
 | zip         | `.zip`                                                         |
+
+
+## Actions
+
+`zfind` does not implement actions like `find`, instead use `xargs -0` to execute commands:
+
+```
+zfind -w 'name like "%.txt" and not archive' -0 | xargs -0 -L1 echo
+```
+
+zfind can also produce `--csv` that can be piped to other commands.
 
 
 ## Installation

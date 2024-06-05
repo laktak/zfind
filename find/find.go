@@ -12,7 +12,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bodgit/sevenzip"
 	"github.com/laktak/zfind/filter"
+	"github.com/nwaples/rardecode"
 )
 
 type FileInfo struct {
@@ -79,41 +81,6 @@ func (file FileInfo) Context() filter.VariableGetter {
 	}
 }
 
-func listFilesInZip(fullpath string) ([]FileInfo, error) {
-	f, err := os.Open(fullpath)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	fi, err := f.Stat()
-	if err != nil {
-		return nil, err
-	}
-	zr, err := zip.NewReader(f, fi.Size())
-	if err != nil {
-		return nil, err
-	}
-
-	var files []FileInfo
-	for _, zf := range zr.File {
-		rc, err := zf.Open()
-		if err != nil {
-			return nil, err
-		}
-		defer rc.Close()
-		files = append(files, FileInfo{
-			Container: fullpath,
-			Path:      zf.Name,
-			Name:      filepath.Base(zf.Name),
-			Size:      int64(zf.UncompressedSize),
-			ModTime:   zf.Modified,
-			Type:      "file",
-			Archive:   "zip"})
-	}
-	return files, nil
-}
-
 func listFilesInTar(fullpath string) ([]FileInfo, error) {
 	f, err := os.Open(fullpath)
 	if err != nil {
@@ -165,6 +132,97 @@ func listFilesInTar(fullpath string) ([]FileInfo, error) {
 	return files, nil
 }
 
+func listFilesInZip(fullpath string) ([]FileInfo, error) {
+	f, err := os.Open(fullpath)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	fi, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
+	zr, err := zip.NewReader(f, fi.Size())
+	if err != nil {
+		return nil, err
+	}
+
+	var files []FileInfo
+	for _, zf := range zr.File {
+		rc, err := zf.Open()
+		if err != nil {
+			return nil, err
+		}
+		defer rc.Close()
+		files = append(files, FileInfo{
+			Container: fullpath,
+			Path:      zf.Name,
+			Name:      filepath.Base(zf.Name),
+			Size:      int64(zf.UncompressedSize),
+			ModTime:   zf.Modified,
+			Type:      "file",
+			Archive:   "zip"})
+	}
+	return files, nil
+}
+
+func listFilesIn7Zip(fullpath string) ([]FileInfo, error) {
+
+	r, err := sevenzip.OpenReader(fullpath)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Close()
+
+	var files []FileInfo
+	for _, h := range r.File {
+		files = append(files, FileInfo{
+			Container: fullpath,
+			Path:      h.Name,
+			Name:      filepath.Base(h.Name),
+			Size:      h.FileInfo().Size(),
+			ModTime:   h.Modified,
+			Type:      "file",
+			Archive:   "7z"})
+	}
+
+	return files, nil
+}
+
+func listFilesInRar(fullpath string) ([]FileInfo, error) {
+
+	r, err := rardecode.OpenReader(fullpath, "")
+	if err != nil {
+		return nil, err
+	}
+	defer r.Close()
+
+	var files []FileInfo
+	for {
+		h, err := r.Next()
+		if err == io.EOF {
+			break
+		}
+
+		t := "file"
+		if h.IsDir {
+			t = "dir"
+		}
+
+		files = append(files, FileInfo{
+			Container: fullpath,
+			Path:      h.Name,
+			Name:      filepath.Base(h.Name),
+			Size:      h.UnPackedSize,
+			ModTime:   h.ModificationTime,
+			Type:      t,
+			Archive:   "rar"})
+	}
+
+	return files, nil
+}
+
 func findIn(param WalkParams, fi FileInfo) {
 
 	if ok, err := param.Filter.Test(fi.Context()); err != nil {
@@ -175,37 +233,34 @@ func findIn(param WalkParams, fi FileInfo) {
 	}
 
 	fullpath := fi.Path
-	isTar, isZip := false, false
-	if !fi.IsDir() {
-		isTar = strings.HasSuffix(fullpath, ".tar") ||
-			strings.HasSuffix(fullpath, ".tar.gz") || strings.HasSuffix(fullpath, ".tgz") ||
-			strings.HasSuffix(fullpath, ".tar.bz2") || strings.HasSuffix(fullpath, ".tbz2")
-		isZip = strings.HasSuffix(fullpath, ".zip")
-	}
-
 	var files []FileInfo
 	var err error = nil
 
-	switch {
-	case isTar:
-		files, err = listFilesInTar(fullpath)
-
-	case isZip:
-		files, err = listFilesInZip(fullpath)
-	default:
+	if fi.IsDir() {
 		return
+	}
+	if strings.HasSuffix(fullpath, ".tar") ||
+		strings.HasSuffix(fullpath, ".tar.gz") || strings.HasSuffix(fullpath, ".tgz") ||
+		strings.HasSuffix(fullpath, ".tar.bz2") || strings.HasSuffix(fullpath, ".tbz2") {
+		files, err = listFilesInTar(fullpath)
+	} else if strings.HasSuffix(fullpath, ".zip") {
+		files, err = listFilesInZip(fullpath)
+	} else if strings.HasSuffix(fullpath, ".7z") {
+		files, err = listFilesIn7Zip(fullpath)
+	} else if strings.HasSuffix(fullpath, ".rar") {
+		files, err = listFilesInRar(fullpath)
 	}
 
 	if err != nil {
 		param.SendErr(err)
-		return
-	}
-	for _, fi2 := range files {
-		if ok, err := param.Filter.Test(fi2.Context()); err != nil {
-			param.SendErr(err)
-			return
-		} else if ok {
-			param.Chan <- fi2
+	} else {
+		for _, fi2 := range files {
+			if ok, err := param.Filter.Test(fi2.Context()); err != nil {
+				param.SendErr(err)
+				return
+			} else if ok {
+				param.Chan <- fi2
+			}
 		}
 	}
 }

@@ -1,7 +1,7 @@
 
 # zfind
 
-zfind allows you to search for files, including inside `tar` and `zip` archives. It makes finding files easy with a filter syntax that is similar to an SQL-WHERE clause.
+zfind allows you to search for files, including inside `tar`, `zip`, `7z` and `rar` archives. It makes finding files easy with a filter syntax that is similar to an SQL-WHERE clause.
 
 
 ## Basic Usage
@@ -77,12 +77,12 @@ The following file properies are available:
 |-------------|----------------------------------------------------------------|
 | name        | name of the file                                               |
 | path        | full path of the file                                          |
-| container   | path of the container (if inside a zip or tar)                 |
+| container   | path of the container (if inside an archive)                   |
 | size        | file size (uncompressed)                                       |
 | date        | modified date in YYYY-MM-DD format                             |
 | time        | modified time in HH-MM-SS format                               |
 | type        | `file`, `dir`, or `link`                                       |
-| archive     | archive type: `tar`, `zip` or empty                            |
+| archive     | archive type: `tar`, `zip`, `7z`, `rar` or empty               |
 
 Helper properties
 
@@ -97,6 +97,8 @@ Helper properties
 |-------------|----------------------------------------------------------------|
 | tar         | `.tar`, `.tar.gz`, `.tgz`, `.tar.bz2`, `.tbz2`                 |
 | zip         | `.zip`                                                         |
+| 7zip        | `.7z`                                                          |
+| rar         | `.rar`                                                         |
 
 
 ## Actions

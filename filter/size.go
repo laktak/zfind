@@ -22,8 +22,12 @@ func FormatSize(size int64) string {
 	units := []string{"", "K", "M", "G", "T", "P"}
 	unitIndex := int(math.Log(float64(size)) / math.Log(1024))
 	value := float64(size) / math.Pow(1024, float64(unitIndex))
-	if value == math.Floor(value) {
-		return fmt.Sprintf("%d%s", int64(value), units[unitIndex])
+	if unitIndex >= 0 && unitIndex < len(units) {
+		if value == math.Floor(value) {
+			return fmt.Sprintf("%d%s", int64(value), units[unitIndex])
+		}
+		return fmt.Sprintf("%.1f%s", value, units[unitIndex])
+	} else {
+		return fmt.Sprintf("%d", size)
 	}
-	return fmt.Sprintf("%.1f%s", value, units[unitIndex])
 }

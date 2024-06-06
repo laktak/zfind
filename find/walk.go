@@ -68,17 +68,17 @@ func walk(path string, virtPath string, followSymlinks bool, report WalkFunc) {
 			report(&fi, nil)
 			return
 		}
-	}
 
-	names, err := readDirNames(path)
-	if err != nil {
-		report(nil, err)
-	} else {
-		for _, name := range names {
-			rfilename := filepath.Join(path, name)
-			filename := filepath.Join(virtPath, name)
+		names, err := readDirNames(path)
+		if err != nil {
+			report(nil, err)
+		} else {
+			for _, name := range names {
+				rfilename := filepath.Join(path, name)
+				filename := filepath.Join(virtPath, name)
 
-			walk(rfilename, filename, followSymlinks, report)
+				walk(rfilename, filename, followSymlinks, report)
+			}
 		}
 	}
 }

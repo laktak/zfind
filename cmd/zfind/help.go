@@ -6,19 +6,19 @@ zfind uses a filter syntax that is very similar to an SQL-WHERE clause.
 Examples:
 
 	# find files smaller than 10KB
-	zfind -w 'size<10k'
+	zfind 'size<10k'
 
 	# find files modified before 2010 inside a tar
-	zfind -w 'date<"2010" and archive="tar"'
+	zfind 'date<"2010" and archive="tar"'
 
 	# find files named *.go and modified today
-	zfind -w 'name like "%.go" and date=today'
+	zfind 'name like "%.go" and date=today'
 
 	# find directories named foo and bar
-	zfind -w 'name in ("foo", "bar") and type="dir"'
+	zfind 'name in ("foo", "bar") and type="dir"'
 
 	# search for all README.md files and show in long listing format
-	zfind -w 'name="README.md"' -l
+	zfind 'name="README.md"' -l
 
 	# show results in csv format
 	zfind --csv

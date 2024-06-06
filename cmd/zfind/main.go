@@ -60,13 +60,14 @@ func PrintCsv(ch chan find.FileInfo) error {
 func main() {
 	var cli struct {
 		FilterHelp       bool     `short:"H" help:"Show where-filter help."`
-		Where            string   `short:"w" help:"The where-filter (using sql-where syntax, see -H)."`
+		XWhere           string   `name:"where" short:"w" help:"(removed) this option has moved to the <where> argument"`
 		Long             bool     `short:"l" help:"Show long listing format."`
 		Csv              bool     `help:"Show listing as csv."`
 		ArchiveSeparator string   `help:"Separator between the archive name and the file inside" default:"//"`
 		FollowSymlinks   bool     `short:"L" help:"Follow symbolic links."`
 		Print0           bool     `name:"print0" short:"0" help:"Use a a null character instead of the newline character, to be used with the -0 option of xargs."`
 		Version          bool     `short:"V" help:"Show version."`
+		Where            string   `arg:"" name:"where" optional:"" help:"The filter using sql-where syntax (see -H). Use '-' to skip when providing a path."`
 		Paths            []string `arg:"" name:"path" optional:"" help:"Paths to search."`
 	}
 
@@ -82,7 +83,12 @@ func main() {
 		os.Exit(0)
 	}
 
-	if cli.Where == "" {
+	if cli.XWhere != "" {
+		fmt.Println("error: the -w option has been replaced by the <where> argument. Usage: zfind <where> [<path>]")
+		os.Exit(1)
+	}
+
+	if cli.Where == "" || cli.Where == "-" {
 		cli.Where = "1"
 	}
 

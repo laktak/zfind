@@ -8,6 +8,13 @@ import (
 
 type WalkFunc func(file *FileInfo, err error)
 
+type WalkError struct {
+	Path string
+	Err  error
+}
+
+func (e *WalkError) Error() string { return e.Path + ": " + e.Err.Error() }
+
 func fsWalk(root string, followSymlinks bool, report WalkFunc) {
 	walk(root, root, followSymlinks, report)
 }
@@ -48,21 +55,20 @@ func walk(path string, virtPath string, followSymlinks bool, report WalkFunc) {
 
 	osFileInfo, err := os.Lstat(path)
 	if err != nil {
-		report(nil, err)
+		report(nil, &WalkError{Path: path, Err: err})
 	} else {
 		fi := makeFileInfo(virtPath, osFileInfo)
 		if fi.IsDir() {
 			report(&fi, nil)
-			//err = walk(path, virtPath, followSymlinks, report)
 		} else if fi.Type == "link" && followSymlinks {
-			path, err = filepath.EvalSymlinks(path)
+			rpath, err := filepath.EvalSymlinks(path)
 			if err != nil {
-				report(nil, err)
+				report(nil, &WalkError{Path: path, Err: err})
 				return
 			}
+			path = rpath
 			fi.Type = "dir"
 			report(&fi, nil)
-			//err = walk(path, virtPath, followSymlinks, report)
 		} else {
 			// file
 			report(&fi, nil)
@@ -71,7 +77,7 @@ func walk(path string, virtPath string, followSymlinks bool, report WalkFunc) {
 
 		names, err := readDirNames(path)
 		if err != nil {
-			report(nil, err)
+			report(nil, &WalkError{Path: path, Err: err})
 		} else {
 			for _, name := range names {
 				rfilename := filepath.Join(path, name)

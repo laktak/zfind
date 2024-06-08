@@ -131,7 +131,7 @@ func main() {
 
 	hasErr := false
 	for errmsg := range errChan {
-		fmt.Fprintln(os.Stderr, errmsg)
+		fmt.Fprintln(os.Stderr, "error: "+errmsg)
 		hasErr = true
 	}
 

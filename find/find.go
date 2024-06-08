@@ -29,6 +29,13 @@ type FileInfo struct {
 
 func (fi FileInfo) IsDir() bool { return fi.Type == "dir" }
 
+type FindError struct {
+	Path string
+	Err  error
+}
+
+func (e *FindError) Error() string { return e.Path + ": " + e.Err.Error() }
+
 const (
 	fieldName      = "name"
 	fieldPath      = "path"
@@ -84,7 +91,7 @@ func (file FileInfo) Context() filter.VariableGetter {
 func listFilesInTar(fullpath string) ([]FileInfo, error) {
 	f, err := os.Open(fullpath)
 	if err != nil {
-		return nil, err
+		return nil, &FindError{Path: fullpath, Err: err}
 	}
 	defer f.Close()
 
@@ -92,7 +99,7 @@ func listFilesInTar(fullpath string) ([]FileInfo, error) {
 	switch {
 	case strings.HasSuffix(fullpath, ".gz") || strings.HasSuffix(fullpath, ".tgz"):
 		if fr, err = gzip.NewReader(f); err != nil {
-			return nil, err
+			return nil, &FindError{Path: fullpath, Err: err}
 		}
 	case strings.HasSuffix(fullpath, ".bz2") || strings.HasSuffix(fullpath, ".tbz2"):
 		fr = bzip2.NewReader(f)
@@ -107,7 +114,7 @@ func listFilesInTar(fullpath string) ([]FileInfo, error) {
 			break
 		}
 		if err != nil {
-			return nil, err
+			return nil, &FindError{Path: fullpath, Err: err}
 		}
 		switch h.Typeflag {
 		case tar.TypeReg, tar.TypeDir, tar.TypeSymlink:
@@ -135,24 +142,24 @@ func listFilesInTar(fullpath string) ([]FileInfo, error) {
 func listFilesInZip(fullpath string) ([]FileInfo, error) {
 	f, err := os.Open(fullpath)
 	if err != nil {
-		return nil, err
+		return nil, &FindError{Path: fullpath, Err: err}
 	}
 	defer f.Close()
 
 	fi, err := f.Stat()
 	if err != nil {
-		return nil, err
+		return nil, &FindError{Path: fullpath, Err: err}
 	}
 	zr, err := zip.NewReader(f, fi.Size())
 	if err != nil {
-		return nil, err
+		return nil, &FindError{Path: fullpath, Err: err}
 	}
 
 	var files []FileInfo
 	for _, zf := range zr.File {
 		rc, err := zf.Open()
 		if err != nil {
-			return nil, err
+			return nil, &FindError{Path: fullpath, Err: err}
 		}
 		defer rc.Close()
 		files = append(files, FileInfo{
@@ -171,7 +178,7 @@ func listFilesIn7Zip(fullpath string) ([]FileInfo, error) {
 
 	r, err := sevenzip.OpenReader(fullpath)
 	if err != nil {
-		return nil, err
+		return nil, &FindError{Path: fullpath, Err: err}
 	}
 	defer r.Close()
 
@@ -194,7 +201,7 @@ func listFilesInRar(fullpath string) ([]FileInfo, error) {
 
 	r, err := rardecode.OpenReader(fullpath, "")
 	if err != nil {
-		return nil, err
+		return nil, &FindError{Path: fullpath, Err: err}
 	}
 	defer r.Close()
 
@@ -225,20 +232,22 @@ func listFilesInRar(fullpath string) ([]FileInfo, error) {
 
 func findIn(param WalkParams, fi FileInfo) {
 
+	fullpath := fi.Path
+
 	if ok, err := param.Filter.Test(fi.Context()); err != nil {
-		param.SendErr(err)
+		param.SendErr(&FindError{Path: fullpath, Err: err})
 		return
 	} else if ok {
 		param.Chan <- fi
 	}
 
-	fullpath := fi.Path
 	var files []FileInfo
 	var err error = nil
 
 	if fi.IsDir() {
 		return
 	}
+
 	if strings.HasSuffix(fullpath, ".tar") ||
 		strings.HasSuffix(fullpath, ".tar.gz") || strings.HasSuffix(fullpath, ".tgz") ||
 		strings.HasSuffix(fullpath, ".tar.bz2") || strings.HasSuffix(fullpath, ".tbz2") {
@@ -256,7 +265,7 @@ func findIn(param WalkParams, fi FileInfo) {
 	} else {
 		for _, fi2 := range files {
 			if ok, err := param.Filter.Test(fi2.Context()); err != nil {
-				param.SendErr(err)
+				param.SendErr(&FindError{Path: fullpath, Err: err})
 				return
 			} else if ok {
 				param.Chan <- fi2

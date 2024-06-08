@@ -6,13 +6,14 @@ import (
 	"os"
 
 	"github.com/alecthomas/kong"
+	"github.com/fatih/color"
 	"github.com/laktak/zfind/filter"
 	"github.com/laktak/zfind/find"
 )
 
 var appVersion = "vdev"
 
-func PrintFiles(ch chan find.FileInfo, long bool, archSep string, lineSep []byte) {
+func printFiles(ch chan find.FileInfo, long bool, archSep string, lineSep []byte) {
 	for file := range ch {
 		name := ""
 		if file.Container != "" {
@@ -29,7 +30,7 @@ func PrintFiles(ch chan find.FileInfo, long bool, archSep string, lineSep []byte
 	}
 }
 
-func PrintCsv(ch chan find.FileInfo) error {
+func printCsv(ch chan find.FileInfo) error {
 	writer := csv.NewWriter(os.Stdout)
 
 	if err := writer.Write(find.Fields[:]); err != nil {
@@ -108,6 +109,7 @@ func main() {
 	ch := make(chan find.FileInfo)
 	errChan := make(chan string)
 
+	// start search
 	go func() {
 		for _, searchPath := range cli.Paths {
 			find.Walk(searchPath, find.WalkParams{
@@ -120,18 +122,21 @@ func main() {
 		close(errChan)
 	}()
 
+	// print results
 	go func() {
 		if cli.Csv {
-			arg.FatalIfErrorf(PrintCsv(ch))
+			arg.FatalIfErrorf(printCsv(ch))
 		} else {
-			PrintFiles(ch, cli.Long, cli.ArchiveSeparator, lineSep)
+			printFiles(ch, cli.Long, cli.ArchiveSeparator, lineSep)
 		}
 		done <- true
 	}()
 
+	// print errors
 	hasErr := false
+	var errCol = color.New(color.FgRed).SprintFunc()
 	for errmsg := range errChan {
-		fmt.Fprintln(os.Stderr, "error: "+errmsg)
+		fmt.Fprintln(color.Error, errCol("error: "+errmsg))
 		hasErr = true
 	}
 
@@ -139,7 +144,7 @@ func main() {
 	<-done
 
 	if hasErr {
-		fmt.Fprintln(os.Stderr, "errors were encountered")
+		fmt.Fprintln(color.Error, errCol("errors were encountered!"))
 		os.Exit(1)
 	}
 }

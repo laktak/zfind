@@ -120,3 +120,8 @@ zfind is built for a number of platforms by GitHub actions.
 
 Download a binary from [releases](https://github.com/laktak/zfind/releases) and place it in your `PATH`.
 
+For macOS and Linux it can also be installed via [Homebrew](https://formulae.brew.sh/formula/zfind):
+
+```
+brew install zfind
+```

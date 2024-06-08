@@ -244,7 +244,7 @@ func findIn(param WalkParams, fi FileInfo) {
 	var files []FileInfo
 	var err error = nil
 
-	if fi.IsDir() {
+	if fi.IsDir() || param.NoArchive {
 		return
 	}
 
@@ -279,6 +279,7 @@ type WalkParams struct {
 	Err            chan string
 	Filter         *filter.FilterExpression
 	FollowSymlinks bool
+	NoArchive      bool
 }
 
 func (wp WalkParams) SendErr(err error) {

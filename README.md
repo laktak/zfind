@@ -114,6 +114,11 @@ zfind 'name like "%.txt" and not archive' -0 | xargs -0 -L1 echo
 zfind can also produce `--csv` that can be piped to other commands.
 
 
+## Configuration
+
+Set the environment variable `NO_COLOR` to disable color output.
+
+
 ## Installation
 
 zfind is built for a number of platforms by GitHub actions.

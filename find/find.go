@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -278,6 +279,10 @@ func findIn(param WalkParams, fi FileInfo) {
 	} else if strings.HasSuffix(fullpath, ".rar") {
 		files, err = listFilesInRar(fullpath)
 	}
+
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].Path < files[j].Path
+	})
 
 	if err != nil {
 		param.SendErr(err)

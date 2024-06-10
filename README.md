@@ -21,8 +21,11 @@ zfind 'size between 1M and 1G' /some/path
 # find files modified before 2010 inside a tar
 zfind 'date<"2010" and archive="tar"'
 
-# find files named *.go and modified today
-zfind 'name like "%.go" and date=today'
+# find files named foo* and modified today
+zfind 'name like "foo%" and date=today'
+
+# find files that have the extension .jpg or .jpeg
+zfind 'ext in ("jpg","jpeg")'
 
 # find directories named foo and bar
 zfind 'name in ("foo", "bar") and type="dir"'
@@ -83,6 +86,8 @@ The following file properies are available:
 | size        | file size (uncompressed)                                       |
 | date        | modified date in YYYY-MM-DD format                             |
 | time        | modified time in HH-MM-SS format                               |
+| ext         | short file extension (e.g. `txt`)                              |
+| ext2        | long file extension (two parts, e.g. `tar.gz`)                 |
 | type        | `file`, `dir`, or `link`                                       |
 | archive     | archive type: `tar`, `zip`, `7z`, `rar` or empty               |
 

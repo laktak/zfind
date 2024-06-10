@@ -30,6 +30,8 @@ The following file properies are available:
   size        file size (uncompressed)
   date        modified date in YYYY-MM-DD format
   time        modified time in HH-MM-SS format
+  ext         short file extension (e.g. 'txt')
+  ext2        long file extension (two parts, e.g. 'tar.gz')
   type        file|dir|link
   archive     archive type tar|zip if inside a container
   container   path of container (if any)

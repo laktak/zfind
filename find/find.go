@@ -43,6 +43,8 @@ const (
 	fieldSize      = "size"
 	fieldDate      = "date"
 	fieldTime      = "time"
+	fieldExt       = "ext"
+	fieldExt2      = "ext2"
 	fieldType      = "type"
 	fieldArchive   = "archive"
 	fieldToday     = "today"
@@ -55,6 +57,8 @@ var Fields = [...]string{
 	fieldSize,
 	fieldDate,
 	fieldTime,
+	fieldExt,
+	fieldExt2,
 	fieldType,
 	fieldArchive,
 	// not exported
@@ -76,6 +80,10 @@ func (file FileInfo) Context() filter.VariableGetter {
 			return filter.TextValue(file.ModTime.Format(time.DateOnly))
 		case fieldTime:
 			return filter.TextValue(file.ModTime.Format(time.TimeOnly))
+		case fieldExt:
+			return filter.TextValue(strings.TrimPrefix(filepath.Ext(file.Name), "."))
+		case fieldExt2:
+			return filter.TextValue(strings.TrimPrefix(ext2(file.Name), "."))
 		case fieldType:
 			return filter.TextValue(file.Type)
 		case fieldArchive:

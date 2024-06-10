@@ -88,3 +88,15 @@ func walk(path string, virtPath string, followSymlinks bool, report WalkFunc) {
 		}
 	}
 }
+
+func ext2(path string) string {
+	for i, n := len(path)-1, 0; i >= 0 && !os.IsPathSeparator(path[i]); i-- {
+		if path[i] == '.' {
+			n += 1
+			if n == 2 {
+				return path[i:]
+			}
+		}
+	}
+	return ""
+}

@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+export TZ='UTC'
 script_dir=$(dirname "$(realpath "$0")")
 base_dir=$(dirname "$script_dir")
 dir=$(realpath "$script_dir/../testdata/run_test")
@@ -13,7 +14,10 @@ fi
 
 # setup
 
-status1=$(cd $base_dir; git status --porcelain)
+status1=$(
+    cd $base_dir
+    git status --porcelain
+)
 
 $script_dir/build
 
@@ -54,7 +58,10 @@ zft size01 / 'size < 1K and type="file"' -l
 
 # check result
 
-status2=$(cd $base_dir; git status --porcelain)
+status2=$(
+    cd $base_dir
+    git status --porcelain
+)
 if [ -n "$status2" ]; then
     if [ -n "$status1" ]; then
         echo "run_tests was started with a dirty git directory, please verify the results manually."
@@ -62,5 +69,9 @@ if [ -n "$status2" ]; then
     fi
     echo "run_tests detected changes in the test output"
     echo "$status2"
+    cd $base_dir
+    git diff
     exit 1
+else
+    echo "run_tests: OK"
 fi

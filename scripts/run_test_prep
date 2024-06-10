@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export TZ='UTC'
 root="/tmp/zfind"
 
 go run scripts/run_test_prep.go

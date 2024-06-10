@@ -18,9 +18,13 @@ jobs:
     - name: chkfmt
       run: scripts/chkfmt
 
+    - name: prep-test
+      run: scripts/run_test_prep
+
     - name: tests
       run: |
         scripts/tests
+        scripts/run_tests
 
     - name: xbuild
       run: scripts/xbuild

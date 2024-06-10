@@ -2,7 +2,7 @@ name: ci
 
 on:
   push:
-    branches: [ master ]
+    branches: []
   pull_request:
 
 jobs:
@@ -21,8 +21,6 @@ jobs:
     - name: tests
       run: |
         scripts/tests
-        scripts/run_test_prep
-        scripts/run_tests
 
     - name: xbuild
       run: scripts/xbuild

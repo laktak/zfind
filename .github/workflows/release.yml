@@ -18,7 +18,10 @@ jobs:
       run: scripts/chkfmt
 
     - name: tests
-      run: scripts/tests
+      run: |
+        scripts/tests
+        scripts/run_test_prep
+        scripts/run_tests
 
     - name: xbuild
       run: version=${GITHUB_REF#$"refs/tags/v"} scripts/xbuild

@@ -1,0 +1,66 @@
+#!/bin/bash
+set -e
+
+script_dir=$(dirname "$(realpath "$0")")
+base_dir=$(dirname "$script_dir")
+dir=$(realpath "$script_dir/../testdata/run_test")
+root="/tmp/zfind/root"
+
+if [[ ! -d $root ]]; then
+    echo "must run run_test_prep first"
+    exit 1
+fi
+
+# setup
+
+status1=$(cd $base_dir; git status --porcelain)
+
+$script_dir/build
+
+rm -rf $dir
+mkdir -p $dir
+
+function zft {
+    local name=$1
+    shift
+    local path=$1
+    shift
+    cd $root/$path
+    "$base_dir/zfind" "$@" > "$dir/$name.txt"
+}
+
+# run actual tests
+
+zft plain01 day/car
+
+zft csv01 day/car 'type!="dir"' --csv
+
+zft link01 / 'name like "party-%"'
+zft link02 / 'name like "party-%"' -L
+
+zft arc01 day --archive-separator=": " 'path like "life/%" and archive="zip"'
+
+zft name01 / 'name="service-friend.md"' -l
+zft name02 / 'name like "air%"' -l
+zft name03 / 'name ilike "%History%" and type="dir"' .
+
+zft ext01 / 'ext in ("jpg","jpeg") and size>100k'
+zft ext02 / 'ext in ("jpg","jpeg") and size>250k and (not container or container like "%.tar.gz")' -l
+
+zft date01 / 'date < "2002"' -l
+zft date02 / 'date between "2004" and "2005-12-31"' -l
+
+zft size01 / 'size < 1K and type="file"' -l
+
+# check result
+
+status2=$(cd $base_dir; git status --porcelain)
+if [ -n "$status2" ]; then
+    if [ -n "$status1" ]; then
+        echo "run_tests was started with a dirty git directory, please verify the results manually."
+        exit 1
+    fi
+    echo "run_tests detected changes in the test output"
+    echo "$status2"
+    exit 1
+fi

@@ -1,4 +1,7 @@
 #!/bin/bash
 set -e
 
+script_dir=$(dirname "$(realpath "$0")")
+cd $script_dir/..
+
 go test -v ./filter

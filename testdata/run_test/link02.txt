@@ -1,0 +1,8 @@
+day/car/face/party-result.mp4
+people/face/party-result.png
+people/history/party-result.png
+people/thing.tar.bz2//body/history/party-result.mp4
+people/thing.tbz2//body/history/party-result.mp4
+way/thing.tar//body/history/party-result.mp4
+year/thing.tar.gz//body/history/party-result.mp4
+year/thing.tgz//body/history/party-result.mp4

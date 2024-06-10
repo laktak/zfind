@@ -1,0 +1,3 @@
+way/thing.tar//body/history/
+year/thing.tar.gz//body/history/
+year/thing.tgz//body/history/

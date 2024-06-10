@@ -1,0 +1,11 @@
+time.zip: life/world-school.txt
+time.zip: life/state-family.md
+time.zip: life/student-group-country.pdf
+time.zip: life/problem-hand.jpg
+time.zip: life/part-place.jpeg
+time.zip: life/case
+time.zip: life/case/week-company.png
+time.zip: life/case/system-program.mp4
+time.zip: life/case/work-government-number.mp3
+time.zip: life/case/night-point.csv
+time.zip: life/case/home-water.txt

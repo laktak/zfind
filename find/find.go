@@ -147,6 +147,14 @@ func listFilesInTar(fullpath string) ([]FileInfo, error) {
 	return files, nil
 }
 
+func getZipNameAndType(path string) (string, string) {
+	if strings.HasSuffix(path, "/") {
+		return path[:len(path)-1], "dir"
+	} else {
+		return path, "file"
+	}
+}
+
 func listFilesInZip(fullpath string) ([]FileInfo, error) {
 	f, err := os.Open(fullpath)
 	if err != nil {
@@ -170,13 +178,14 @@ func listFilesInZip(fullpath string) ([]FileInfo, error) {
 			return nil, &FindError{Path: fullpath, Err: err}
 		}
 		defer rc.Close()
+		name, t := getZipNameAndType(zf.Name)
 		files = append(files, FileInfo{
 			Container: fullpath,
-			Path:      zf.Name,
-			Name:      filepath.Base(zf.Name),
+			Path:      name,
+			Name:      filepath.Base(name),
 			Size:      int64(zf.UncompressedSize),
 			ModTime:   zf.Modified,
-			Type:      "file",
+			Type:      t,
 			Archive:   "zip"})
 	}
 	return files, nil
@@ -192,13 +201,15 @@ func listFilesIn7Zip(fullpath string) ([]FileInfo, error) {
 
 	var files []FileInfo
 	for _, h := range r.File {
+
+		name, t := getZipNameAndType(h.Name)
 		files = append(files, FileInfo{
 			Container: fullpath,
-			Path:      h.Name,
-			Name:      filepath.Base(h.Name),
+			Path:      name,
+			Name:      filepath.Base(name),
 			Size:      h.FileInfo().Size(),
 			ModTime:   h.Modified,
-			Type:      "file",
+			Type:      t,
 			Archive:   "7z"})
 	}
 

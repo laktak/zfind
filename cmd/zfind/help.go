@@ -33,7 +33,7 @@ The following file properies are available:
   ext         short file extension (e.g. 'txt')
   ext2        long file extension (two parts, e.g. 'tar.gz')
   type        file|dir|link
-  archive     archive type tar|zip if inside a container
+  archive     archive type tar|zip|7z|rar if inside a container
   container   path of container (if any)
 
 Helper properties

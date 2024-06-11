@@ -110,13 +110,14 @@ Helper properties
 | 7zip        | `.7z`                                                          |
 | rar         | `.rar`                                                         |
 
+> Note: use the flag -n (or --no-archive) to disable archive support. You can also use `'not archive'` in your query but this still requires `zfind` to open the archive.
 
 ## Actions
 
 `zfind` does not implement actions like `find`, instead use `xargs -0` to execute commands:
 
 ```
-zfind 'name like "%.txt" and not archive' -0 | xargs -0 -L1 echo
+zfind --no-archive 'name like "%.txt"' -0 | xargs -0 -L1 echo
 ```
 
 zfind can also produce `--csv` that can be piped to other commands.

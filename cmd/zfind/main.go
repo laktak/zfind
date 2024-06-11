@@ -62,14 +62,14 @@ func main() {
 	var cli struct {
 		FilterHelp       bool     `short:"H" help:"Show where-filter help."`
 		Long             bool     `short:"l" help:"Show long listing format."`
-		Csv              bool     `help:"Show listing as csv."`
+		Csv              bool     `help:"Show listing as CSV."`
 		ArchiveSeparator string   `help:"Separator between the archive name and the file inside" default:"//"`
 		FollowSymlinks   bool     `short:"L" help:"Follow symbolic links."`
 		NoArchive        bool     `short:"n" help:"Disables archive support."`
-		Print0           bool     `name:"print0" short:"0" help:"Use a a null character instead of the newline character, to be used with the -0 option of xargs."`
+		Print0           bool     `name:"print0" short:"0" help:"Use a null character instead of the newline character, to be used with the -0 option of xargs."`
 		Version          bool     `short:"V" help:"Show version."`
 		XWhere           string   `name:"where" short:"w" help:"(removed) this option has moved to the <where> argument"`
-		Where            string   `arg:"" name:"where" optional:"" help:"The filter using sql-where syntax (see -H). Use '-' to skip when providing a path."`
+		Where            string   `arg:"" name:"where" optional:"" help:"The filter using SQL-where syntax (see -H). Use '-' to skip when providing a path."`
 		Paths            []string `arg:"" name:"path" optional:"" help:"Paths to search."`
 	}
 

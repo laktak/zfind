@@ -1,27 +1,42 @@
 package main
 
-var filter_help = `
+var headerHelp = `Search for files, including inside tar, zip, 7z and rar archives.
+ zfind makes finding files easy with a filter syntax that is similar to an SQL-WHERE clause.
+ For examples run "zfind -H" or go to
+ https://github.com/laktak/zfind
+`
+
+var filterHelp = `
 zfind uses a filter syntax that is very similar to an SQL-WHERE clause.
 
 Examples:
 
-	# find files smaller than 10KB
-	zfind 'size<10k'
+  # find files smaller than 10KB, in the current path
+  zfind 'size<10k'
 
-	# find files modified before 2010 inside a tar
-	zfind 'date<"2010" and archive="tar"'
+  # find files in the given range in /some/path
+  zfind 'size between 1M and 1G' /some/path
 
-	# find files named *.go and modified today
-	zfind 'name like "%.go" and date=today'
+  # find files modified before 2010 inside a tar
+  zfind 'date<"2010" and archive="tar"'
 
-	# find directories named foo and bar
-	zfind 'name in ("foo", "bar") and type="dir"'
+  # find files named foo* and modified today
+  zfind 'name like "foo%" and date=today'
 
-	# search for all README.md files and show in long listing format
-	zfind 'name="README.md"' -l
+  # find files that contain two dashes using a regex
+  zfind 'name rlike "(.*-){2}"'
 
-	# show results in csv format
-	zfind --csv
+  # find files that have the extension .jpg or .jpeg
+  zfind 'ext in ("jpg","jpeg")'
+
+  # find directories named foo and bar
+  zfind 'name in ("foo", "bar") and type="dir"'
+
+  # search for all README.md files and show in long listing format
+  zfind 'name="README.md"' -l
+
+  # show results in csv format
+  zfind --csv
 
 The following file properties are available:
 

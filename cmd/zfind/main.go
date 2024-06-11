@@ -68,26 +68,23 @@ func main() {
 		NoArchive        bool     `short:"n" help:"Disables archive support."`
 		Print0           bool     `name:"print0" short:"0" help:"Use a null character instead of the newline character, to be used with the -0 option of xargs."`
 		Version          bool     `short:"V" help:"Show version."`
-		XWhere           string   `name:"where" short:"w" help:"(removed) this option has moved to the <where> argument"`
 		Where            string   `arg:"" name:"where" optional:"" help:"The filter using SQL-where syntax (see -H). Use '-' to skip when providing a path."`
 		Paths            []string `arg:"" name:"path" optional:"" help:"Paths to search."`
 	}
 
-	arg := kong.Parse(&cli)
+	arg := kong.Parse(&cli,
+		kong.Name("zfind"),
+		kong.Description(headerHelp),
+		kong.UsageOnError())
 
 	if cli.FilterHelp {
-		fmt.Println(filter_help)
+		fmt.Println(filterHelp)
 		os.Exit(0)
 	}
 
 	if cli.Version {
 		fmt.Println(appVersion)
 		os.Exit(0)
-	}
-
-	if cli.XWhere != "" {
-		fmt.Println("error: the -w option has been replaced by the <where> argument. Usage: zfind <where> [<path>]")
-		os.Exit(1)
 	}
 
 	if cli.Where == "" || cli.Where == "-" {

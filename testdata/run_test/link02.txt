@@ -1,4 +1,5 @@
 day/car/face/party-result.mp4
+day/friend/party-result.png
 people/face/party-result.png
 people/history/party-result.png
 people/thing.tar.bz2//body/history/party-result.mp4

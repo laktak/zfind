@@ -8,6 +8,7 @@ go run scripts/run_test_prep.go
 cd $root/root/time
 zip -r ../day/time.zip *
 7z a ../year/time.7z *
+rm -rf $root/root/time
 
 cd $root/root/thing
 tar -cvf ../way/thing.tar *
@@ -15,10 +16,10 @@ tar -czvf ../year/thing.tar.gz *
 tar -czvf ../year/thing.tgz *
 tar -cjvf ../people/thing.tar.bz2 *
 tar -cjvf ../people/thing.tbz2 *
+rm -rf $root/root/thing
 
 cd $root/root
-rm -rf $root/root/time $root/root/thing
 mv $root/root/people $root/people
 ln -s ../people people
-
+ln -s ../../people/face/office-door.pdf day/friend/party-result.png
 find -L | wc -l

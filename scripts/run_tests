@@ -39,8 +39,8 @@ zft plain01 day/car
 
 zft csv01 day/car 'type!="dir"' --csv
 
-zft link01 / 'name like "party-%"'
-zft link02 / 'name like "party-%"' -L
+zft link01 / 'name like "party-%" and type="file"'
+zft link02 / 'name like "party-%" and type="file"' -L
 
 zft arc01 day --archive-separator=": " 'path like "life/%" and archive="zip"'
 

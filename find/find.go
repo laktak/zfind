@@ -19,16 +19,26 @@ import (
 )
 
 type FileInfo struct {
-	Container string
 	Name      string
 	Path      string
+	ModTime   time.Time
 	Size      int64
 	Type      string
+	Container string
 	Archive   string
-	ModTime   time.Time
 }
 
 func (fi FileInfo) IsDir() bool { return fi.Type == "dir" }
+
+func (fi FileInfo) fromSymlink(fi2 FileInfo) FileInfo {
+	return FileInfo{
+		Name:    fi.Name,
+		Path:    fi.Path,
+		ModTime: fi2.ModTime,
+		Size:    fi2.Size,
+		Type:    fi2.Type,
+	}
+}
 
 type FindError struct {
 	Path string
@@ -69,24 +79,24 @@ var Fields = [...]string{
 func (file FileInfo) Context() filter.VariableGetter {
 	return func(name string) *filter.Value {
 		switch strings.ToLower(name) {
-		case fieldContainer:
-			return filter.TextValue(file.Container)
 		case fieldName:
 			return filter.TextValue(file.Name)
 		case fieldPath:
 			return filter.TextValue(file.Path)
-		case fieldSize:
-			return filter.NumberValue(file.Size)
 		case fieldDate:
 			return filter.TextValue(file.ModTime.Format(time.DateOnly))
 		case fieldTime:
 			return filter.TextValue(file.ModTime.Format(time.TimeOnly))
+		case fieldSize:
+			return filter.NumberValue(file.Size)
 		case fieldExt:
 			return filter.TextValue(strings.TrimPrefix(filepath.Ext(file.Name), "."))
 		case fieldExt2:
 			return filter.TextValue(strings.TrimPrefix(ext2(file.Name), "."))
 		case fieldType:
 			return filter.TextValue(file.Type)
+		case fieldContainer:
+			return filter.TextValue(file.Container)
 		case fieldArchive:
 			return filter.TextValue(file.Archive)
 		case fieldToday:
@@ -135,12 +145,12 @@ func listFilesInTar(fullpath string) ([]FileInfo, error) {
 			}
 
 			files = append(files, FileInfo{
-				Container: fullpath,
-				Path:      h.Name,
 				Name:      filepath.Base(h.Name),
-				Size:      h.Size,
+				Path:      h.Name,
 				ModTime:   h.ModTime,
+				Size:      h.Size,
 				Type:      t,
+				Container: fullpath,
 				Archive:   "tar"})
 		}
 	}
@@ -181,12 +191,12 @@ func listFilesInZip(fullpath string) ([]FileInfo, error) {
 		defer rc.Close()
 		name, t := getZipNameAndType(zf.Name)
 		files = append(files, FileInfo{
-			Container: fullpath,
-			Path:      name,
 			Name:      filepath.Base(name),
-			Size:      int64(zf.UncompressedSize),
+			Path:      name,
 			ModTime:   zf.Modified,
+			Size:      int64(zf.UncompressedSize),
 			Type:      t,
+			Container: fullpath,
 			Archive:   "zip"})
 	}
 	return files, nil
@@ -205,12 +215,12 @@ func listFilesIn7Zip(fullpath string) ([]FileInfo, error) {
 
 		name, t := getZipNameAndType(h.Name)
 		files = append(files, FileInfo{
-			Container: fullpath,
-			Path:      name,
 			Name:      filepath.Base(name),
-			Size:      h.FileInfo().Size(),
+			Path:      name,
 			ModTime:   h.Modified,
+			Size:      h.FileInfo().Size(),
 			Type:      t,
+			Container: fullpath,
 			Archive:   "7z"})
 	}
 
@@ -238,12 +248,12 @@ func listFilesInRar(fullpath string) ([]FileInfo, error) {
 		}
 
 		files = append(files, FileInfo{
-			Container: fullpath,
-			Path:      h.Name,
 			Name:      filepath.Base(h.Name),
-			Size:      h.UnPackedSize,
+			Path:      h.Name,
 			ModTime:   h.ModificationTime,
+			Size:      h.UnPackedSize,
 			Type:      t,
+			Container: fullpath,
 			Archive:   "rar"})
 	}
 

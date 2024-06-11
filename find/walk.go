@@ -29,10 +29,10 @@ func makeFileInfo(fullpath string, file os.FileInfo) FileInfo {
 	}
 
 	return FileInfo{
-		Path:    fullpath,
 		Name:    file.Name(),
-		Size:    file.Size(),
+		Path:    fullpath,
 		ModTime: file.ModTime(),
+		Size:    file.Size(),
 		Type:    t,
 	}
 }
@@ -62,13 +62,20 @@ func walk(path string, virtPath string, followSymlinks bool, report WalkFunc) {
 			report(&fi, nil)
 		} else if fi.Type == "link" && followSymlinks {
 			rpath, err := filepath.EvalSymlinks(path)
+			if err == nil {
+				osFileInfo, err = os.Lstat(rpath)
+			}
 			if err != nil {
 				report(nil, &WalkError{Path: path, Err: err})
 				return
 			}
+			fi2 := makeFileInfo(virtPath, osFileInfo)
+			fi = fi.fromSymlink(fi2)
 			path = rpath
-			fi.Type = "dir"
 			report(&fi, nil)
+			if !fi2.IsDir() {
+				return
+			}
 		} else {
 			// file
 			report(&fi, nil)

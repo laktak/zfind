@@ -24,6 +24,9 @@ zfind 'date<"2010" and archive="tar"'
 # find files named foo* and modified today
 zfind 'name like "foo%" and date=today'
 
+# find files that contain two dashes using a regex
+zfind 'name rlike "(.*-){2}"'
+
 # find files that have the extension .jpg or .jpeg
 zfind 'ext in ("jpg","jpeg")'
 

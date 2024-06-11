@@ -1,0 +1,7 @@
+day/car/city-community.mp4
+day/friend/city-community.mp4
+way/thing.tar//issue/end/car-city.mp4
+year/head/car/city-community.png
+year/study/friend/city-community.png
+year/thing.tar.gz//issue/end/car-city.mp4
+year/thing.tgz//issue/end/car-city.mp4

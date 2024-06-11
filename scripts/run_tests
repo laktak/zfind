@@ -56,6 +56,10 @@ zft date02 / 'date between "2004" and "2005-12-31"' -l
 
 zft size01 / 'size < 1K and type="file"' -l
 
+zft reg01 / 'name rlike ".*\\.tar\\.gz"'
+zft reg02 way 'name rlike "(.+-){2}" and size>200k'
+zft reg03 / 'name rlike "^[abc].*-[a-d]"'
+
 # check result
 
 status2=$(

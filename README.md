@@ -54,7 +54,7 @@ Example: `'date > "2020-10-01"'` selects all files that were modified after the 
   - `LIKE` is case-sensitive, while `ILIKE` is case-insensitive.
   - The `%` symbol is used as a wildcard character that matches any sequence of characters.
   - The `_` symbol matches any single character.
-  - `RLIKE` allows to match a regular expression.
+  - `RLIKE` allows matching a regular expression.
 
 Example: `'"name like "z%"'` selects all files whose name starts with 'z'.
 
@@ -73,13 +73,13 @@ Example: `'"name not like "z%"'`, `'"date not between "2010" and "2011-01-15"'`,
 - Values can be numbers, text, date and time, `TRUE` and `FALSE`
   - dates have to be specified in `YYYY-MM-DD` format
   - times have to be specified in 24h `HH:MM:SS` format
-  - numbers can be written as sizes by appending `B`, `K`, `M`, `G` and `T` to specify bytes, KB, MB, GB and TB.
+  - numbers can be written as sizes by appending `B`, `K`, `M`, `G` and `T` to specify bytes, KB, MB, GB, and TB.
   - empty strings and `0` evaluate to `false`
 
 
 ## Properties
 
-The following file properies are available:
+The following file properties are available:
 
 | name        | description                                                    |
 |-------------|----------------------------------------------------------------|
@@ -98,7 +98,7 @@ Helper properties
 
 | name        | description                                                    |
 |-------------|----------------------------------------------------------------|
-| today       | todays date                                                    |
+| today       | today's date                                                    |
 
 
 ## Supported archives

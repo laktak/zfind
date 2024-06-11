@@ -23,7 +23,7 @@ Examples:
 	# show results in csv format
 	zfind --csv
 
-The following file properies are available:
+The following file properties are available:
 
   name        name of the file
   path        full path of the file

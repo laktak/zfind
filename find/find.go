@@ -18,6 +18,7 @@ import (
 	"github.com/nwaples/rardecode"
 )
 
+// FileInfo is a type that represents information about a file or directory.
 type FileInfo struct {
 	Name      string
 	Path      string
@@ -28,6 +29,8 @@ type FileInfo struct {
 	Archive   string
 }
 
+// IsDir returns a boolean value indicating if the FileInfo instance is a
+// directory.
 func (fi FileInfo) IsDir() bool { return fi.Type == "dir" }
 
 func (fi FileInfo) fromSymlink(fi2 FileInfo) FileInfo {
@@ -40,6 +43,7 @@ func (fi FileInfo) fromSymlink(fi2 FileInfo) FileInfo {
 	}
 }
 
+// FindError is a type that represents an error that occurred during a file search.
 type FindError struct {
 	Path string
 	Err  error
@@ -61,6 +65,7 @@ const (
 	fieldToday     = "today"
 )
 
+// Fields is a slice of the constants that address fields in the FileInfo type.
 var Fields = [...]string{
 	fieldName,
 	fieldPath,
@@ -76,6 +81,11 @@ var Fields = [...]string{
 	// fieldToday
 }
 
+// Context is a method of the FileInfo type that returns a VariableGetter function
+// that can be used to retrieve the values of the fields of the file or directory
+// represented by the FileInfo instance.
+//
+// It also generates helper properties like "today".
 func (file FileInfo) Context() filter.VariableGetter {
 	return func(name string) *filter.Value {
 		switch strings.ToLower(name) {
@@ -265,7 +275,7 @@ func findIn(param WalkParams, fi FileInfo) {
 	fullpath := fi.Path
 
 	if ok, err := param.Filter.Test(fi.Context()); err != nil {
-		param.SendErr(&FindError{Path: fullpath, Err: err})
+		param.sendErr(&FindError{Path: fullpath, Err: err})
 		return
 	} else if ok {
 		param.Chan <- fi
@@ -295,11 +305,11 @@ func findIn(param WalkParams, fi FileInfo) {
 	})
 
 	if err != nil {
-		param.SendErr(err)
+		param.sendErr(err)
 	} else {
 		for _, fi2 := range files {
 			if ok, err := param.Filter.Test(fi2.Context()); err != nil {
-				param.SendErr(&FindError{Path: fullpath, Err: err})
+				param.sendErr(&FindError{Path: fullpath, Err: err})
 				return
 			} else if ok {
 				param.Chan <- fi2
@@ -308,25 +318,34 @@ func findIn(param WalkParams, fi FileInfo) {
 	}
 }
 
+// WalkParams is used to specify the parameters for a file search.
 type WalkParams struct {
-	Chan           chan FileInfo
-	Err            chan string
-	Filter         *filter.FilterExpression
+	// Chan is the channel that is used to send the results of the search.
+	Chan chan FileInfo
+	// Err is the channel that is used to send error messages.
+	Err chan string
+	// Filter is the filter expression that is used to filter the results of the search.
+	Filter *filter.FilterExpression
+	// FollowSymlinks specifies whether symbolic links should be followed during the search.
 	FollowSymlinks bool
-	NoArchive      bool
+	// NoArchive specifies whether archives should be skipped during the search.
+	NoArchive bool
 }
 
-func (wp WalkParams) SendErr(err error) {
+// Sends an error message to the error channel of the WalkParams instance.
+func (wp WalkParams) sendErr(err error) {
 	serr := fmt.Sprintf("%v", err)
 	wp.Err <- serr
 }
 
+// Walk is a function that performs a file search starting at the given root
+// directory. See WalkParams to control the behavior of the search.
 func Walk(root string, param WalkParams) {
 	fsWalk(root, param.FollowSymlinks, func(fi *FileInfo, err error) {
 		if err == nil {
 			findIn(param, *fi)
 		} else {
-			param.SendErr(err)
+			param.sendErr(err)
 		}
 	})
 }

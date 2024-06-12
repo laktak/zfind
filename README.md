@@ -150,3 +150,18 @@ brew install zfind
 paru -S zfind
 ```
 
+## zfind as a Go module
+
+zfind is can also be used in other Go programs.
+
+```
+go get github.com/laktak/zfind
+```
+
+The library consists of two main packages:
+
+- [filter](https://pkg.go.dev/github.com/laktak/zfind/filter): provides functionality for parsing and evaluating SQL-where filter expressions
+- [find](https://pkg.go.dev/github.com/laktak/zfind/find): implements searching for files and directories.
+
+For more information see the linked documentation on pkg.go.dev.
+

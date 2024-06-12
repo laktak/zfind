@@ -10,6 +10,10 @@ import (
 type context struct {
 	get VariableGetter
 }
+
+// VariableGetter is a function type that is used to retrieve the value of a variable
+// by its name. It takes a single string argument (the name of the variable) and
+// returns a pointer to a Value instance that represents the value of the variable.
 type VariableGetter func(name string) *Value
 
 var ErrInvalidOperatorOrOperands = errors.New("invalid operator or operands")
@@ -265,10 +269,16 @@ func (x *expression) eval(ctx context) (*value, error) {
 	return boolValue(r), nil
 }
 
+// FilterExpression is a parsed and compiled representation of a filter string.
+// It can be used to efficiently test whether a set of variables matches the filter.
 type FilterExpression struct {
 	expression *expression
 }
 
+// Test tests whether the set of variables provided by the getter function matches
+// the filter expression. It returns a boolean value indicating whether the variables
+// match the filter, as well as an error value if there was a problem evaluating the
+// expression, like a type mismatch or a missing variable.
 func (x *FilterExpression) Test(getter VariableGetter) (bool, error) {
 	ctx := context{get: getter}
 	if r, err := x.expression.eval(ctx); err != nil {
@@ -278,6 +288,9 @@ func (x *FilterExpression) Test(getter VariableGetter) (bool, error) {
 	}
 }
 
+// CreateFilter parses the given filter string and returns a compiled FilterExpression
+// that can be used to efficiently test the filter. If the filter string is not valid,
+// an error is returned.
 func CreateFilter(filter string) (*FilterExpression, error) {
 	if expr, err := parser.ParseString("", filter); err != nil {
 		return nil, err

@@ -3,7 +3,21 @@
 
 `zfind` allows you to search for files, including inside `tar`, `zip`, `7z` and `rar` archives. It makes finding files easy with a filter syntax that is similar to an SQL-WHERE clause. This means, if you know SQL, you don't have to learn or remember any new syntax just for this tool.
 
-## Basic Usage
+- [Basic Usage & Examples](#basic-usage--examples)
+- [Where Syntax](#where-syntax)
+- [Properties](#properties)
+- [Supported archives](#supported-archives)
+- [Actions](#actions)
+- [Configuration](#configuration)
+- [Installation](#installation)
+  - [Binary releases](#binary-releases)
+  - [Homebrew (macOS and Linux)](#homebrew-macos-and-linux)
+  - [Arch Linux](#arch-linux)
+  - [Build from Source](#build-from-source)
+- [zfind as a Go module](#zfind-as-a-go-module)
+
+
+## Basic Usage & Examples
 
 ```shell
 zfind <where> [<path>...]
@@ -13,34 +27,34 @@ Examples
 
 ```console
 # find files smaller than 10KB, in the current path
-$ zfind 'size<10k'
+zfind 'size<10k'
 
 # find files in the given range in /some/path
-$ zfind 'size between 1M and 1G' /some/path
+zfind 'size between 1M and 1G' /some/path
 
 # find files modified before 2010 inside a tar
-$ zfind 'date<"2010" and archive="tar"'
+zfind 'date<"2010" and archive="tar"'
 
 # find files named foo* and modified today
-$ zfind 'name like "foo%" and date=today'
+zfind 'name like "foo%" and date=today'
 
 # find files that contain two dashes using a regex
-$ zfind 'name rlike "(.*-){2}"'
+zfind 'name rlike "(.*-){2}"'
 
 # find files that have the extension .jpg or .jpeg
-$ zfind 'ext in ("jpg","jpeg")'
+zfind 'ext in ("jpg","jpeg")'
 
 # find directories named foo and bar
-$ zfind 'name in ("foo", "bar") and type="dir"'
+zfind 'name in ("foo", "bar") and type="dir"'
 
 # search for all README.md files and show in long listing format
-$ zfind 'name="README.md"' -l
+zfind 'name="README.md"' -l
 
 # show results in csv format
-$ zfind --csv
+zfind --csv
 ```
 
-## Where
+## Where Syntax
 
 - `AND`, `OR` and `()` parentheses are logical operators used to combine multiple conditions. `AND` means that both conditions must be true for a row to be included in the results. `OR` means that if either condition is true, the row will be included. Parentheses are used to group conditions, just like in mathematics.
 
@@ -110,17 +124,18 @@ Helper properties
 | 7zip        | `.7z`                                                          |
 | rar         | `.rar`                                                         |
 
-> Note: use the flag -n (or --no-archive) to disable archive support. You can also use `'not archive'` in your query but this still requires `zfind` to open the archive.
+> Note: use the flag -n (or --no-archive) to disable archive support. You can also use `'not archive'` in your query but this still requires zfind to open the archive.
+
 
 ## Actions
 
-`zfind` does not implement actions like `find`, instead use `xargs -0` to execute commands:
+zfind does not implement actions like `find`, instead use `xargs -0` to execute commands:
 
 ```shell
 zfind --no-archive 'name like "%.txt"' -0 | xargs -0 -L1 echo
 ```
 
-`zfind` can also produce `--csv` that can be piped to other commands.
+zfind can also produce `--csv` that can be piped to other commands.
 
 
 ## Configuration
@@ -130,25 +145,48 @@ Set the environment variable `NO_COLOR` to disable color output.
 
 ## Installation
 
-`zfind` is built for a number of platforms by GitHub actions.
 
-Download a binary from [releases](https://github.com/laktak/zfind/releases) and place it in your `PATH`.
+### Binary releases
+
+You can download the official zfind binaries from the releases page and place it in your `PATH`.
+
+- https://github.com/laktak/zfind/releases
 
 ### Homebrew (macOS and Linux)
 
 For macOS and Linux it can also be installed via [Homebrew](https://formulae.brew.sh/formula/zfind):
 
-```
+```shell
 brew install zfind
 ```
 
 ### Arch Linux
 
-`zfind` is available in the AUR as [zfind](https://aur.archlinux.org/packages/zfind/):
+zfind is available in the AUR as [zfind](https://aur.archlinux.org/packages/zfind/):
 
-```
+```shell
 paru -S zfind
 ```
+
+### Build from Source
+
+Building from the source requires Go.
+
+- Either install it directly
+
+```shell
+go install github.com/laktak/zfind@latest
+```
+
+- or clone and build
+
+```shell
+git clone https://github.com/laktak/zfind
+zfind/scripts/build
+# output is here:
+zfind/zfind
+```
+
 
 ## zfind as a Go module
 

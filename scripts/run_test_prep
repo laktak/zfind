@@ -14,8 +14,10 @@ cd $root/root/thing
 tar -cvf ../way/thing.tar *
 tar -czvf ../year/thing.tar.gz *
 tar -czvf ../year/thing.tgz *
-tar -cjvf ../people/thing.tar.bz2 *
-tar -cjvf ../people/thing.tbz2 *
+tar --bzip2 -cvf ../people/thing.tar.bz2 *
+tar --bzip2 -cvf ../people/thing.tbz2 *
+tar --xz -cvf ../people/thing.tar.xz *
+tar --xz -cvf ../people/thing.txz *
 rm -rf $root/root/thing
 
 cd $root/root

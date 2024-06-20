@@ -16,6 +16,7 @@ import (
 	"github.com/bodgit/sevenzip"
 	"github.com/laktak/zfind/filter"
 	"github.com/nwaples/rardecode"
+	"github.com/ulikunitz/xz"
 )
 
 // FileInfo is a type that represents information about a file or directory.
@@ -132,6 +133,10 @@ func listFilesInTar(fullpath string) ([]FileInfo, error) {
 		}
 	case strings.HasSuffix(fullpath, ".bz2") || strings.HasSuffix(fullpath, ".tbz2"):
 		fr = bzip2.NewReader(f)
+	case strings.HasSuffix(fullpath, ".xz") || strings.HasSuffix(fullpath, ".txz"):
+		if fr, err = xz.NewReader(f); err != nil {
+			return nil, &FindError{Path: fullpath, Err: err}
+		}
 	}
 
 	r := tar.NewReader(fr)
@@ -290,7 +295,8 @@ func findIn(param WalkParams, fi FileInfo) {
 
 	if strings.HasSuffix(fullpath, ".tar") ||
 		strings.HasSuffix(fullpath, ".tar.gz") || strings.HasSuffix(fullpath, ".tgz") ||
-		strings.HasSuffix(fullpath, ".tar.bz2") || strings.HasSuffix(fullpath, ".tbz2") {
+		strings.HasSuffix(fullpath, ".tar.bz2") || strings.HasSuffix(fullpath, ".tbz2") ||
+		strings.HasSuffix(fullpath, ".tar.xz") || strings.HasSuffix(fullpath, ".txz") {
 		files, err = listFilesInTar(fullpath)
 	} else if strings.HasSuffix(fullpath, ".zip") {
 		files, err = listFilesInZip(fullpath)

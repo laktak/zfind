@@ -29,6 +29,7 @@ function zft {
     shift
     local path=$1
     shift
+    echo "- $name"
     cd $root/$path
     "$base_dir/zfind" "$@" > "$dir/$name.txt"
 }
@@ -41,6 +42,7 @@ zft csv01 day/car 'type!="dir"' --csv
 
 zft link01 / 'name like "party-%" and type="file"'
 zft link02 / 'name like "party-%" and type="file"' -L
+zft link03 / 'container like "%.tar.xz" and archive="tar" and name ilike "Art-%"' -L
 
 zft arc01 day --archive-separator=": " 'path like "life/%" and archive="zip"'
 

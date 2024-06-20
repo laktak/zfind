@@ -95,34 +95,34 @@ Example: `'"name not like "z%"'`, `'"date not between "2010" and "2011-01-15"'`,
 
 The following file properties are available:
 
-| name        | description                                                    |
-|-------------|----------------------------------------------------------------|
-| name        | name of the file                                               |
-| path        | full path of the file                                          |
-| container   | path of the container (if inside an archive)                   |
-| size        | file size (uncompressed)                                       |
-| date        | modified date in YYYY-MM-DD format                             |
-| time        | modified time in HH-MM-SS format                               |
-| ext         | short file extension (e.g., `txt`)                              |
-| ext2        | long file extension (two parts, e.g., `tar.gz`)                 |
-| type        | `file`, `dir`, or `link`                                       |
-| archive     | archive type: `tar`, `zip`, `7z`, `rar` or empty               |
+| name        | description                                                       |
+|-------------|-------------------------------------------------------------------|
+| name        | name of the file                                                  |
+| path        | full path of the file                                             |
+| container   | path of the container (if inside an archive)                      |
+| size        | file size (uncompressed)                                          |
+| date        | modified date in YYYY-MM-DD format                                |
+| time        | modified time in HH-MM-SS format                                  |
+| ext         | short file extension (e.g., `txt`)                                |
+| ext2        | long file extension (two parts, e.g., `tar.gz`)                   |
+| type        | `file`, `dir`, or `link`                                          |
+| archive     | archive type: `tar`, `zip`, `7z`, `rar` or empty                  |
 
 Helper properties
 
-| name        | description                                                    |
-|-------------|----------------------------------------------------------------|
-| today       | today's date                                                    |
+| name        | description                                                       |
+|-------------|-------------------------------------------------------------------|
+| today       | today's date                                                      |
 
 
 ## Supported archives
 
-| name        | extensions                                                     |
-|-------------|----------------------------------------------------------------|
-| tar         | `.tar`, `.tar.gz`, `.tgz`, `.tar.bz2`, `.tbz2`                 |
-| zip         | `.zip`                                                         |
-| 7zip        | `.7z`                                                          |
-| rar         | `.rar`                                                         |
+| name        | extensions                                                        |
+|-------------|-------------------------------------------------------------------|
+| tar         | `.tar`, `.tar.gz`, `.tgz`, `.tar.bz2`, `.tbz2`, `.tar.xz`, `.txz` |
+| zip         | `.zip`                                                            |
+| 7zip        | `.7z`                                                             |
+| rar         | `.rar`                                                            |
 
 > Note: use the flag -n (or --no-archive) to disable archive support. You can also use `'not archive'` in your query but this still requires zfind to open the archive.
 

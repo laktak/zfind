@@ -113,6 +113,13 @@ Helper properties
 | name        | description                                                       |
 |-------------|-------------------------------------------------------------------|
 | today       | today's date                                                      |
+| mo          | last monday's date                                                |
+| tu          | last tuesday's date                                               |
+| we          | last wednesday's date                                             |
+| th          | last thursday's date                                              |
+| fr          | last friday's date                                                |
+| sa          | last saturday's date                                              |
+| su          | last sunday's date                                                |
 
 
 ## Supported archives

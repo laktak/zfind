@@ -63,7 +63,6 @@ const (
 	fieldExt2      = "ext2"
 	fieldType      = "type"
 	fieldArchive   = "archive"
-	fieldToday     = "today"
 )
 
 // Fields is a slice of the constants that address fields in the FileInfo type.
@@ -78,8 +77,6 @@ var Fields = [...]string{
 	fieldExt2,
 	fieldType,
 	fieldArchive,
-	// not exported
-	// fieldToday
 }
 
 // Context is a method of the FileInfo type that returns a VariableGetter function
@@ -110,12 +107,36 @@ func (file FileInfo) Context() filter.VariableGetter {
 			return filter.TextValue(file.Container)
 		case fieldArchive:
 			return filter.TextValue(file.Archive)
-		case fieldToday:
+		case "today":
 			return filter.TextValue(time.Now().Format(time.DateOnly))
+		case "mo":
+			return getLastWeekday(time.Monday)
+		case "tu":
+			return getLastWeekday(time.Tuesday)
+		case "we":
+			return getLastWeekday(time.Wednesday)
+		case "th":
+			return getLastWeekday(time.Thursday)
+		case "fr":
+			return getLastWeekday(time.Friday)
+		case "sa":
+			return getLastWeekday(time.Saturday)
+		case "su":
+			return getLastWeekday(time.Sunday)
 		default:
 			return nil
 		}
 	}
+}
+
+func getLastWeekday(weekday time.Weekday) *filter.Value {
+	now := time.Now()
+	offs := int(weekday - now.Weekday())
+	if offs >= 0 {
+		offs -= 7
+	}
+	day := now.AddDate(0, 0, offs)
+	return filter.TextValue(day.Format(time.DateOnly))
 }
 
 func listFilesInTar(fullpath string) ([]FileInfo, error) {

@@ -54,6 +54,13 @@ The following file properties are available:
 Helper properties
 
   today       todays date
+  mo          last monday's date
+  tu          last tuesday's date
+  we          last wednesday's date
+  th          last thursday's date
+  fr          last friday's date
+  sa          last saturday's date
+  su          last sunday's date
 
 For more details go to https://github.com/laktak/zfind
 `

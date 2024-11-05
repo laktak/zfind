@@ -37,6 +37,7 @@ Examples:
 
   # show results in csv format
   zfind --csv
+  zfind --csv-no-head
 
 The following file properties are available:
 

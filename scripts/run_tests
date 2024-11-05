@@ -39,6 +39,7 @@ function zft {
 zft plain01 day/car
 
 zft csv01 day/car 'type!="dir"' --csv
+zft csv02 way/job 'type="file"' --csv-no-head
 
 zft link01 / 'name like "party-%" and type="file"'
 zft link02 / 'name like "party-%" and type="file"' -L

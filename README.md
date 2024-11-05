@@ -52,6 +52,7 @@ zfind 'name="README.md"' -l
 
 # show results in csv format
 zfind --csv
+zfind --csv-no-head
 ```
 
 ## Where Syntax
@@ -142,7 +143,7 @@ zfind does not implement actions like `find`, instead use `xargs -0` to execute 
 zfind --no-archive 'name like "%.txt"' -0 | xargs -0 -L1 echo
 ```
 
-zfind can also produce `--csv` that can be piped to other commands.
+zfind can also produce `--csv` (or `--csv-no-head`) that can be piped to other commands.
 
 
 ## Configuration

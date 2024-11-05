@@ -30,11 +30,13 @@ func printFiles(ch chan find.FileInfo, long bool, archSep string, lineSep []byte
 	}
 }
 
-func printCsv(ch chan find.FileInfo) error {
+func printCsv(header bool, ch chan find.FileInfo) error {
 	writer := csv.NewWriter(os.Stdout)
 
-	if err := writer.Write(find.Fields[:]); err != nil {
-		return err
+	if header {
+		if err := writer.Write(find.Fields[:]); err != nil {
+			return err
+		}
 	}
 
 	for file := range ch {
@@ -63,6 +65,7 @@ func main() {
 		FilterHelp       bool     `short:"H" help:"Show where-filter help."`
 		Long             bool     `short:"l" help:"Show long listing format."`
 		Csv              bool     `help:"Show listing as CSV."`
+		CsvNoHead        bool     `help:"Show listing as CSV without header."`
 		ArchiveSeparator string   `help:"Separator between the archive name and the file inside" default:"//"`
 		FollowSymlinks   bool     `short:"L" help:"Follow symbolic links."`
 		NoArchive        bool     `short:"n" help:"Disables archive support."`
@@ -124,7 +127,9 @@ func main() {
 	// print results
 	go func() {
 		if cli.Csv {
-			arg.FatalIfErrorf(printCsv(ch))
+			arg.FatalIfErrorf(printCsv(true, ch))
+		} else if cli.CsvNoHead {
+			arg.FatalIfErrorf(printCsv(false, ch))
 		} else {
 			printFiles(ch, cli.Long, cli.ArchiveSeparator, lineSep)
 		}

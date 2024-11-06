@@ -29,3 +29,8 @@ jobs:
     - name: xbuild
       run: scripts/xbuild
 
+    - name: artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: prerelease-artifacts
+        path: dist/*

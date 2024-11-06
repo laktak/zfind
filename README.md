@@ -160,7 +160,7 @@ You can download the official zfind binaries from the releases page and place it
 
 - https://github.com/laktak/zfind/releases
 
-Prereleased versions can be found directly on the [Git Action](https://github.com/laktak/zfind/actions). Click on the latest action and look for `prerelease-artifacts` at the bottom.
+Prereleased versions can be found directly on the [GitHub Action](https://github.com/laktak/zfind/actions). Click on the latest `ci` action and look for `prerelease-artifacts` at the bottom.
 
 ### Homebrew (macOS and Linux)
 

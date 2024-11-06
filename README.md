@@ -185,7 +185,7 @@ Building from the source requires Go.
 - Either install it directly
 
 ```shell
-go install github.com/laktak/zfind@latest
+go install github.com/laktak/zfind/cmd/zfind@latest
 ```
 
 - or clone and build

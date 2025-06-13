@@ -5,4 +5,4 @@ script_dir=$(dirname "$(realpath "$0")")
 cd $script_dir/..
 
 version=$(git describe --tags --always)
-go build -ldflags="-X main.appVersion=$version" ./cmd/zfind
+CGO_ENABLED=0 go build -ldflags="-X main.appVersion=$version" ./cmd/zfind

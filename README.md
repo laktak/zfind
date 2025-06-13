@@ -154,11 +154,17 @@ Set the environment variable `NO_COLOR` to disable color output.
 ## Installation
 
 
-### Binary releases
+### Install/Update Binaries
 
-You can download the official zfind binaries from the releases page and place it in your `PATH`.
+```
+curl https://laktak.github.io/zfind.sh|bash
+```
 
-- https://github.com/laktak/zfind/releases
+This will download the zfind binary for your OS/Platform from the GitHub releases page and install it to `~/.local/bin`. You will get a message if that's not in your `PATH`.
+
+You probably want to download or view the [setup script](https://laktak.github.io/zfind.sh) before piping it to bash.
+
+If you prefer you can download a binary from [github.com/laktak/zfind/releases](https://github.com/laktak/zfind/releases) manually and place it in your `PATH`.
 
 Prereleased versions can be found directly on the [GitHub Action](https://github.com/laktak/zfind/actions). Click on the latest `ci` action and look for `prerelease-artifacts` at the bottom.
 

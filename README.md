@@ -1,6 +1,8 @@
 
 # zfind
 
+{ repos & mirrors: [github.com/laktak/zfind](https://github.com/laktak/zfind/), [codeberg.org/laktak/zfind](https://codeberg.org/laktak/zfind) }
+
 `zfind` allows you to search for files, including inside `tar`, `zip`, `7z` and `rar` archives. It makes finding files easy with a filter syntax that is similar to an SQL-WHERE clause. This means, if you know SQL, you don't have to learn or remember any new syntax just for this tool.
 
 

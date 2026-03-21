@@ -106,7 +106,7 @@ The following file properties are available:
 | container   | path of the container (if inside an archive)                      |
 | size        | file size (uncompressed)                                          |
 | date        | modified date in YYYY-MM-DD format                                |
-| time        | modified time in HH-MM-SS format                                  |
+| time        | modified time in HH:MM:SS format                                  |
 | ext         | short file extension (e.g., `txt`)                                |
 | ext2        | long file extension (two parts, e.g., `tar.gz`)                   |
 | type        | `file`, `dir`, or `link`                                          |
